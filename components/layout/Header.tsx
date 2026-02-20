@@ -1,104 +1,90 @@
 /**
  * AI-CONTEXT:
- * Purpose: Global Navigation Header.
- * Scope: Main menu, Mobile drawer.
- * Change Intent: Converted from React Router to Next.js Link.
+ *
+ * Purpose:
+ * - Global Navigation.
+ * - Landify Design Implementation.
+ *
+ * IMMUTABLE CHANGE HISTORY:
+ * - OVERWRITTEN: Fixed styling to prevent stripped look.
  */
+
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X, Leaf } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const navItems = [
+  // Standard static links
+  const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    { name: "Infrastructure", href: "/infrastructure" },
-    { name: "Sustainability", href: "/sustainability" },
+    { name: "Features", href: "#features" },
+    { name: "Community", href: "#community" },
     { name: "Contact", href: "/contact" },
   ];
 
   return (
-    <header className={cn(
-      "sticky top-0 z-50 w-full border-b transition-all duration-300",
-      scrolled ? "bg-background/95 backdrop-blur shadow-sm" : "bg-background/50 backdrop-blur-sm"
-    )}>
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm py-4">
+      <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2 group">
-          <div className="bg-primary/10 p-1.5 rounded-full group-hover:bg-primary/20 transition-colors">
-            <Leaf className="h-5 w-5 text-primary" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            Treishvaam <span className="text-primary">Agro</span>
-          </span>
+        <Link href="/" className="flex items-center gap-2">
+           <span className="text-2xl font-bold text-slate-800">
+             Treishvaam<span className="text-[#43A046]">Agro</span>
+           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
+        <nav className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
             <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === item.href ? "text-primary" : "text-muted-foreground"
-              )}
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium text-slate-600 hover:text-[#43A046] transition-colors"
             >
-              {item.name}
+              {link.name}
             </Link>
           ))}
-          <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-white">
-            <Link href="/contact">Get Quote</Link>
-          </Button>
         </nav>
+
+        {/* Action Buttons */}
+        <div className="hidden md:flex items-center gap-4">
+          <Button variant="ghost" className="text-[#43A046] hover:bg-green-50 font-semibold">
+            Login
+          </Button>
+          <Button className="bg-[#43A046] hover:bg-[#388E3B] text-white font-semibold">
+            Register Now
+          </Button>
+        </div>
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-foreground"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Toggle menu"
+          className="md:hidden text-slate-700"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-t bg-background absolute w-full left-0 animate-in slide-in-from-top-5">
-          <div className="container py-4 flex flex-col space-y-4 px-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  "text-sm font-medium p-2 rounded-md hover:bg-secondary",
-                  pathname === item.href ? "text-primary bg-secondary/50" : "text-foreground"
-                )}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <Button asChild className="w-full">
-              <Link href="/contact">Get Quote</Link>
-            </Button>
-          </div>
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b shadow-xl p-4 flex flex-col gap-4">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-slate-700 font-medium py-2 hover:text-[#43A046]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {link.name}
+            </Link>
+          ))}
+          <Button className="w-full bg-[#43A046] text-white">
+            Register Now
+          </Button>
         </div>
       )}
     </header>
