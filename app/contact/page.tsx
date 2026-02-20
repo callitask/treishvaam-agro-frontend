@@ -34,7 +34,8 @@ export default function ContactPage() {
         </div>
 
         <div className="bg-brand-offWhite p-8 md:p-10 rounded-2xl border border-brand-border shadow-sm">
-          <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+          {/* Removed onSubmit to keep this a Server Component for SEO */}
+          <form className="flex flex-col gap-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
                 <label className="text-sm font-medium text-brand-textDark">First Name *</label>
@@ -61,7 +62,8 @@ export default function ContactPage() {
               <textarea rows={4} className="w-full px-4 py-3 rounded-md border border-brand-border bg-white focus:outline-none focus:ring-2 focus:ring-brand-green/50 resize-none" placeholder="Please mention products and estimated volume..." required></textarea>
             </div>
 
-            <button type="submit" className="mt-2 bg-brand-gold hover:bg-brand-goldHover text-white font-medium px-8 py-3.5 rounded-full transition-colors shadow-md w-full sm:w-auto self-start">
+            {/* Changed type to "button" to prevent full page reload on click during static mockup phase */}
+            <button type="button" className="mt-2 bg-brand-gold hover:bg-brand-goldHover text-white font-medium px-8 py-3.5 rounded-full transition-colors shadow-md w-full sm:w-auto self-start">
               Submit Inquiry
             </button>
           </form>
