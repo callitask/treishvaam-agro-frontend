@@ -20,9 +20,10 @@
  * Non-Negotiables:
  * - Must precisely follow the 32px (Top Bar) and 80px (Main Nav) height specs.
  * - Sticky drop-shadow must trigger exactly after scrolling past the Top Bar.
+ * - Content MUST be constrained within max-w-7xl to prevent edge-to-edge stretching.
  *
  * Change Intent:
- * - Upgraded to match the Naturals & Pure reference video spec exactly.
+ * - Fixed layout stretching by wrapping inner contents in max-w-7xl containers.
  *
  * Future AI Guidance:
  * - If adding new routes, simply append to the `navLinks` constant. Do not refactor the scroll listener logic.
@@ -32,6 +33,7 @@
  * • Completely rebuilt to support two-tier architecture.
  * • Added scroll listener for sticky state z-index layering (z-30).
  * • Added Framer Motion for mega-menu transitions.
+ * • Fixed edge-to-edge stretching by adding max-w-7xl constraints.
  * • 2026-02-24
  */
 
@@ -58,14 +60,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Top bar is 32px. We become sticky after passing it.
       setIsScrolled(window.scrollY > 32);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Delay for hover intent on mega menu
   let timeoutId: NodeJS.Timeout;
   const handleMouseEnter = (menu: string) => {
     clearTimeout(timeoutId);
@@ -74,141 +74,139 @@ export default function Navbar() {
   const handleMouseLeave = () => {
     timeoutId = setTimeout(() => {
       setActiveDropdown(null);
-    }, 150); // 150ms delay logic specified in reverse-engineering
+    }, 150);
   };
 
   return (
     <header className="w-full flex flex-col z-50">
       {/* Top Bar - 32px Height, Dark Green */}
-      <div className="bg-brand-dark h-[32px] w-full hidden md:flex items-center justify-between px-6 xl:px-12 text-xs font-medium text-white/90 z-40">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
-            <Mail size={14} />
-            <span>sales@treishvaamagro.com</span>
+      <div className="bg-brand-dark h-[32px] w-full hidden md:block border-b border-white/10 z-40">
+        <div className="max-w-7xl mx-auto h-full px-6 xl:px-0 flex items-center justify-between text-xs font-medium text-white/90">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
+              <Mail size={14} />
+              <span>sales@treishvaamagro.com</span>
+            </div>
+            <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
+              <Phone size={14} />
+              <span>+91 1800-AGRO-123</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
-            <Phone size={14} />
-            <span>+91 1800-AGRO-123</span>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 cursor-pointer hover:text-brand-accent transition-colors duration-150">
+              <Globe size={14} />
+              <span>EN</span>
+            </div>
+            <Link href="/client-portal" className="hover:text-brand-accent transition-colors duration-150">
+              Client Login
+            </Link>
           </div>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 cursor-pointer hover:text-brand-accent transition-colors duration-150">
-            <Globe size={14} />
-            <span>EN</span>
-          </div>
-          <Link href="/client-portal" className="hover:text-brand-accent transition-colors duration-150">
-            Client Login
-          </Link>
         </div>
       </div>
 
       {/* Main Navigation - 80px Height */}
-      <nav 
-        className={`w-full bg-white h-[80px] flex items-center justify-between px-6 xl:px-12 transition-all duration-300 z-30 ${
-          isScrolled ? 'fixed top-0 left-0 shadow-sticky' : 'relative'
-        }`}
-      >
-        {/* Logo */}
-        <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-          {/* Fallback to text if image is missing, matching the structural space */}
-          <div className="w-10 h-10 bg-brand-primary rounded flex items-center justify-center text-white font-bold text-xl">
-            T
-          </div>
-          <span className="text-brand-dark font-bold text-2xl tracking-tight hidden sm:block">
-            Treishvaam <span className="text-brand-primary">Agro</span>
-          </span>
-        </Link>
-
-        {/* Desktop Links */}
-        <div className="hidden lg:flex items-center h-full gap-8">
-          <Link 
-            href="/" 
-            className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-          >
-            Home
+      <div className={`w-full bg-white transition-all duration-300 z-30 ${isScrolled ? 'fixed top-0 left-0 shadow-sticky' : 'relative'}`}>
+        <nav className="max-w-7xl mx-auto h-[80px] flex items-center justify-between px-6 xl:px-0">
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0 flex items-center gap-2">
+            <div className="w-10 h-10 bg-brand-primary rounded flex items-center justify-center text-white font-bold text-xl">
+              T
+            </div>
+            <span className="text-brand-dark font-bold text-2xl tracking-tight hidden sm:block">
+              Treishvaam <span className="text-brand-primary">Agro</span>
+            </span>
           </Link>
-          
-          {/* Products Mega Menu Trigger */}
-          <div 
-            className="h-full flex items-center relative"
-            onMouseEnter={() => handleMouseEnter('products')}
-            onMouseLeave={handleMouseLeave}
-          >
-            <button className={`flex items-center gap-1 text-sm font-semibold transition-colors duration-150 h-full border-b-2 ${pathname.startsWith('/products') ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}>
-              Products <ChevronDown size={16} className={`transition-transform duration-200 ${activeDropdown === 'products' ? 'rotate-180' : ''}`} />
-            </button>
 
-            {/* Mega Menu Dropdown */}
-            <AnimatePresence>
-              {activeDropdown === 'products' && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                  className="absolute top-[80px] left-1/2 -translate-x-1/2 w-[400px] bg-white shadow-mega-menu rounded-b-xl border border-gray-100 overflow-hidden"
-                >
-                  <div className="p-6 grid grid-cols-2 gap-4">
-                    {productsMenu.map((item) => (
-                      <Link 
-                        key={item.name} 
-                        href={item.href}
-                        className="p-3 rounded-lg hover:bg-brand-secondary text-sm font-medium text-gray-800 hover:text-brand-dark transition-colors duration-150"
-                        onClick={() => setActiveDropdown(null)}
-                      >
-                        {item.name}
+          {/* Desktop Links */}
+          <div className="hidden lg:flex items-center h-full gap-8">
+            <Link 
+              href="/" 
+              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
+            >
+              Home
+            </Link>
+            
+            {/* Products Mega Menu Trigger */}
+            <div 
+              className="h-full flex items-center relative"
+              onMouseEnter={() => handleMouseEnter('products')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <button className={`flex items-center gap-1 text-sm font-semibold transition-colors duration-150 h-full border-b-2 ${pathname.startsWith('/products') ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}>
+                Products <ChevronDown size={16} className={`transition-transform duration-200 ${activeDropdown === 'products' ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === 'products' && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                    className="absolute top-[80px] -left-4 w-[400px] bg-white shadow-mega-menu rounded-b-xl border border-gray-100 overflow-hidden"
+                  >
+                    <div className="p-6 grid grid-cols-2 gap-4">
+                      {productsMenu.map((item) => (
+                        <Link 
+                          key={item.name} 
+                          href={item.href}
+                          className="p-3 rounded-lg hover:bg-brand-secondary text-sm font-medium text-gray-800 hover:text-brand-dark transition-colors duration-150"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="bg-gray-50 p-4 border-t border-gray-100">
+                      <Link href="/products" className="text-brand-primary text-sm font-semibold flex items-center hover:underline">
+                        View all products &rarr;
                       </Link>
-                    ))}
-                  </div>
-                  <div className="bg-gray-50 p-4 border-t border-gray-100">
-                    <Link href="/products" className="text-brand-primary text-sm font-semibold flex items-center hover:underline">
-                      View all products &rarr;
-                    </Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Link 
+              href="/infrastructure" 
+              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/infrastructure' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
+            >
+              Infrastructure
+            </Link>
+            <Link 
+              href="/quality" 
+              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/quality' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
+            >
+              Quality & Certs
+            </Link>
+            <Link 
+              href="/sustainability" 
+              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/sustainability' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
+            >
+              Sustainability
+            </Link>
           </div>
 
-          <Link 
-            href="/infrastructure" 
-            className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/infrastructure' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-          >
-            Infrastructure
-          </Link>
-          <Link 
-            href="/quality" 
-            className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/quality' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-          >
-            Quality & Certs
-          </Link>
-          <Link 
-            href="/sustainability" 
-            className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/sustainability' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-          >
-            Sustainability
-          </Link>
-        </div>
+          {/* Action Button */}
+          <div className="hidden lg:flex items-center">
+            <Link 
+              href="/contact" 
+              className="bg-brand-accent hover:bg-brand-accent-hover text-brand-dark font-bold text-sm px-6 py-2.5 rounded-enterprise transition-all duration-150 shadow-resting hover:shadow-lifted"
+            >
+              Request Quote
+            </Link>
+          </div>
 
-        {/* Action Button */}
-        <div className="hidden lg:flex items-center">
-          <Link 
-            href="/contact" 
-            className="bg-brand-accent hover:bg-brand-accent-hover text-brand-dark font-bold text-sm px-6 py-2.5 rounded-enterprise transition-all duration-150 shadow-resting hover:shadow-lifted"
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden text-brand-dark p-2 -mr-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle menu"
           >
-            Request Quote
-          </Link>
-        </div>
-
-        {/* Mobile Menu Toggle */}
-        <button 
-          className="lg:hidden text-brand-dark p-2 -mr-2"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </nav>
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </nav>
+      </div>
 
       {/* Mobile Menu Drawer */}
       <AnimatePresence>
