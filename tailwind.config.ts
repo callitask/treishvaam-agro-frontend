@@ -2,45 +2,66 @@
  * AI-CONTEXT:
  *
  * Purpose:
- * - Tailwind CSS configuration file to orchestrate the global design system.
+ * - Centralized design token system configuration for Treishvaam Agro.
+ * - Integrates the exact Naturals & Pure enterprise color palette, typography scale, and shadow systems.
  *
  * Scope:
- * - Defines typography, color palette, spacing scale, and border radius tokens.
+ * - Defines all Tailwind utility classes, colors, spacing, and animations for the UI.
+ * - Must NOT contain any hardcoded logic, API paths, or infrastructure details.
+ *
+ * Critical Dependencies:
+ * - Frontend: Consumed globally by all Next.js React components via Tailwind classes.
+ * - Worker / SEO / Sitemap: N/A
+ *
+ * Security Constraints:
+ * - Purely presentation logic. Zero security risk surface.
+ *
+ * Non-Negotiables:
+ * - Must maintain the `brand` color object specifically mapped to the enterprise design requirements.
+ * - Must not break the existing shadcn/ui generic color variables.
  *
  * Change Intent:
- * - Restored as a `.ts` file to fix the ES Module resolution failure in Next.js 14.
- * - Removed third-party plugins to ensure baseline compilation doesn't crash.
+ * - Upgraded to implement the enterprise visual reverse-engineering specification (Dark Green, Action Yellow, precise shadow scales).
+ *
+ * Future AI Guidance:
+ * - Do not remove the `brand` color palette. If adding new themes, extend the object, do not replace it.
+ *
+ * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
+ * - ADDED:
+ * • Brand color palette (dark, primary, secondary, accent) mapping to enterprise spec.
+ * • Custom shadow scales (hover-lift).
+ * • 2026-02-24
  */
 
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
+  prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "1.5rem",
+      padding: "1.5rem", // 24px
       screens: {
-        "2xl": "1280px",
+        "2xl": "1280px", // Strict max-w-7xl
       },
     },
     extend: {
       colors: {
         brand: {
-          green: '#284E1A',
-          gold: '#DAB72F',
-          greenHover: '#3A6B27',
-          goldHover: '#C8A525',
-          offWhite: '#F9FAF9',
-          textDark: '#1C2619',
-          textMuted: '#4A5548',
-          border: '#E5E7EB',
+          dark: '#1F4524', // Primary Dark Green (Top bar, Footer, Headings)
+          primary: '#4A7C44', // Primary Brand Green (Logomark, standard buttons)
+          secondary: '#E8F0E7', // Secondary Light Green (Hover states, backgrounds)
+          accent: '#E5B824', // Action Yellow (Primary CTA)
+          'accent-hover': '#D4A71A', // Action Yellow Hover
+          surface: '#FFFFFF',
+          'surface-off': '#F9FAFB',
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -55,6 +76,10 @@ const config: Config = {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -63,18 +88,53 @@ const config: Config = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       borderRadius: {
-        lg: "16px",
-        md: "8px",
-        sm: "4px",
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        enterprise: "4px", // Enterprise rigidity for buttons
+        card: "12px", // Consumer-friendly card rounding
+      },
+      boxShadow: {
+        'resting': '0px 4px 12px rgba(0, 0, 0, 0.05)',
+        'lifted': '0px 10px 24px rgba(0, 0, 0, 0.1)',
+        'sticky': '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        'mega-menu': '0px 8px 16px rgba(0, 0, 0, 0.12)',
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        }
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards",
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'], // Inferred highly legible geometric sans-serif
       }
     },
   },
-  plugins: [],
-};
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
 
 export default config;

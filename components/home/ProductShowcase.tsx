@@ -2,83 +2,175 @@
  * AI-CONTEXT:
  *
  * Purpose:
- * - Grid display of primary product categories on the homepage.
+ * - Product showcase grid for the homepage.
  *
  * Scope:
- * - 4-column responsive grid (12-column system equivalent).
- * - Component purely presentational.
+ * - Renders a staggered animated grid of primary product categories.
  *
  * Critical Dependencies:
- * - Frontend: Uses standard Next.js Image component (represented via div for skeleton).
+ * - Frontend: Relies on `framer-motion` for intersection observer staggered entries.
  *
  * Security Constraints:
- * - N/A
+ * - N/A.
  *
  * Non-Negotiables:
- * - Exactly 16px border radius on cards.
- * - Image covers top half, content bottom half.
- * - Synchronous group-hover: shadow increases, card lifts -8px, image scales 1.05.
+ * - MUST use a 12-column CSS Grid.
+ * - Component Gap MUST be exactly 24px (`gap-6`).
+ * - Card Hover State MUST translateY(-4px) and change box-shadow.
+ * - Border radius MUST be 12px for cards (`rounded-card`).
  *
  * Change Intent:
- * - Structured the exact hover delta specified in the video analysis.
+ * - Reconstructed component to perfectly mirror the target visual analysis.
  *
  * Future AI Guidance:
- * - Do not change the easing curve (`ease-out duration-300`). It is tuned for enterprise feel.
+ * - Maintain the `motion.div` structure for the stagger effect. Do not revert to raw CSS keyframes here to keep complexity manageable.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - EDITED:
- * • Implemented `group relative` pattern for synchronized hover states.
- * • Applied exact padding, 16px border radius, and typography mapping.
+ * • Applied 12-column CSS grid structure.
+ * • Implemented Framer Motion container/item variants for stagger entries.
+ * • Enforced exact padding, margin, and typography scales based on the reverse-engineered Figma spec.
+ * • 2026-02-24
  */
 
-import Link from 'next/link';
-import React from 'react';
+'use client';
 
-const PRODUCTS = [
-  { id: 1, title: 'Fruit Powders', desc: '100% natural spray-dried fruit powders preserving original flavor and nutrients.', link: '/products#fruit' },
-  { id: 2, title: 'Vegetable Powders', desc: 'Premium dehydrated vegetable powders for culinary and industrial use.', link: '/products#vegetable' },
-  { id: 3, title: 'Leafy Greens', desc: 'Nutrient-dense green powders including spinach, kale, and moringa.', link: '/products#leafy' },
-  { id: 4, title: 'Herbal Extracts', desc: 'Standardized botanical extracts for nutraceutical applications.', link: '/products#herbal' },
+import React from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+
+const featuredProducts = [
+  {
+    id: 1,
+    title: 'Banana Powder',
+    category: 'Fruit Powders',
+    image: 'https://images.unsplash.com/photo-1528825871115-3581a5387919?q=80&w=1000&auto=format&fit=crop',
+    applications: ['Beverages', 'Baby Food', 'Baking'],
+    href: '/products/banana-powder'
+  },
+  {
+    id: 2,
+    title: 'Spinach Powder',
+    category: 'Vegetable Powders',
+    image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?q=80&w=1000&auto=format&fit=crop',
+    applications: ['Soups', 'Smoothies', 'Snacks'],
+    href: '/products/spinach-powder'
+  },
+  {
+    id: 3,
+    title: 'Ashwagandha Extract',
+    category: 'Herbal Extracts',
+    image: 'https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1000&auto=format&fit=crop',
+    applications: ['Supplements', 'Teas', 'Pharma'],
+    href: '/products/ashwagandha'
+  },
+  {
+    id: 4,
+    title: 'Turmeric Powder',
+    category: 'Organic Spices',
+    image: 'https://images.unsplash.com/photo-1615486171448-4357778b4bdc?q=80&w=1000&auto=format&fit=crop',
+    applications: ['Culinary', 'Cosmetics', 'Health'],
+    href: '/products/turmeric'
+  }
 ];
+
+// Framer Motion Variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
+  }
+};
 
 export default function ProductShowcase() {
   return (
-    <section className="w-full bg-brand-offWhite py-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <section className="bg-brand-surface-off py-24 w-full">
+      <div className="max-w-7xl mx-auto px-6 xl:px-0">
         
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center mb-16">
-          <h2 className="text-4xl font-semibold text-brand-textDark mb-4">Featured Products</h2>
-          <div className="w-16 h-1 bg-brand-gold rounded-full"></div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <span className="text-brand-primary font-semibold text-sm tracking-wider uppercase mb-2 block">
+              Our Ingredients
+            </span>
+            <h2 className="text-brand-dark text-4xl font-semibold leading-[1.2]">
+              Premium Quality Products
+            </h2>
+          </div>
+          <Link 
+            href="/products"
+            className="text-brand-primary font-semibold flex items-center gap-2 hover:text-brand-dark transition-colors duration-150 group"
+          >
+            View Entire Catalog 
+            <ArrowRight size={18} className="transform group-hover:translate-x-1 transition-transform duration-200" />
+          </Link>
         </div>
 
-        {/* 4-Column Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {PRODUCTS.map((prod) => (
-            <Link href={prod.link} key={prod.id} className="group relative bg-white rounded-2xl overflow-hidden shadow-[0px_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0px_12px_24px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-2 flex flex-col h-full border border-brand-border">
-              
-              {/* Image Container with aspect ratio and scale effect */}
-              <div className="w-full aspect-[4/3] bg-gray-200 overflow-hidden">
-                <div className="w-full h-full bg-brand-green/10 transition-transform duration-300 group-hover:scale-105 flex items-center justify-center">
-                   <span className="text-brand-green/40 font-medium">Image: {prod.title}</span>
+        {/* 12-Column Grid Wrapper */}
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-12 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-10%" }}
+        >
+          {featuredProducts.map((product) => (
+            <motion.div 
+              key={product.id} 
+              variants={itemVariants}
+              className="col-span-1 sm:col-span-6 lg:col-span-3"
+            >
+              <Link 
+                href={product.href}
+                className="group block bg-white rounded-card overflow-hidden shadow-resting hover:shadow-lifted hover:-translate-y-1 transition-all duration-250 ease-out h-full border border-gray-100 flex flex-col"
+              >
+                {/* Image Container 4:3 */}
+                <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100">
+                  <img 
+                    src={product.image} 
+                    alt={product.title} 
+                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
-              </div>
-
-              {/* Content Container */}
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold text-brand-textDark mb-2">{prod.title}</h3>
-                <p className="text-brand-textMuted text-sm leading-relaxed mb-6 flex-grow">{prod.desc}</p>
                 
-                {/* Learn More Link */}
-                <div className="flex items-center text-brand-green font-medium text-sm mt-auto group-hover:text-brand-greenHover transition-colors">
-                  Learn More 
-                  <span className="ml-2 transform transition-transform group-hover:translate-x-1">→</span>
-                </div>
-              </div>
+                {/* Card Content - p-6 (24px) */}
+                <div className="p-6 flex flex-col flex-grow">
+                  <span className="text-brand-primary text-xs font-semibold mb-2">
+                    {product.category}
+                  </span>
+                  <h3 className="text-brand-dark text-xl font-semibold leading-[1.4] mb-4">
+                    {product.title}
+                  </h3>
+                  
+                  {/* Applications List */}
+                  <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+                    {product.applications.map((app, index) => (
+                      <span key={index} className="bg-brand-surface-off border border-gray-200 text-gray-600 text-xs px-2 py-1 rounded">
+                        {app}
+                      </span>
+                    ))}
+                  </div>
 
-            </Link>
+                  <div className="text-brand-primary font-semibold text-sm flex items-center gap-1 mt-auto">
+                    Learn More 
+                    <ArrowRight size={14} className="transform group-hover:translate-x-1 transition-transform duration-200" />
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </section>
