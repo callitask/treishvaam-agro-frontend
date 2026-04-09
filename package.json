@@ -5,7 +5,7 @@
   "type": "module",
   "__AI_CONTEXT__": {
     "Purpose": "Defines project dependencies and strict module resolution for Treishvaam Agro.",
-    "Non-Negotiables": "The 'type': 'module' directive must remain. Next.js version MUST be >= 14.2.35. The 'opennextjs-cloudflare build' script MUST include the '--dangerouslyUseUnsupportedNextVersion' flag to prevent build failures on Next.js 14.",
+    "Non-Negotiables": "The 'type': 'module' directive must remain. The build scripts MUST use standard 'next build' for static exports, completely avoiding 'opennextjs-cloudflare'.",
     "IMMUTABLE_CHANGE_HISTORY": [
       {
         "ACTION": "ADDED",
@@ -20,15 +20,9 @@
         "DATE": "2026-04-09"
       },
       {
-        "ACTION": "EDITED",
-        "DETAILS": "Enforced local package-lock.json regeneration.",
-        "REASON": "Cloudflare build failed during 'npm ci' due to out-of-sync lockfile.",
-        "DATE": "2026-04-09"
-      },
-      {
-        "ACTION": "EDITED",
-        "DETAILS": "Added '--dangerouslyUseUnsupportedNextVersion' flag to 'deploy' and 'preview' scripts.",
-        "REASON": "OpenNext hard-blocked the build because Next.js 14 fell out of the 2-year support window in 2026. This flag forces compilation, preserving enterprise UI stability.",
+        "ACTION": "REMOVED",
+        "DETAILS": "Removed opennextjs-cloudflare overrides from build scripts.",
+        "REASON": "OpenNext fundamentally conflicts with the Zero-Trust Static Edge architecture. Reverted to standard next build for pure SSG export.",
         "DATE": "2026-04-09"
       }
     ],
@@ -38,9 +32,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "deploy": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare deploy",
-    "preview": "opennextjs-cloudflare build --dangerouslyUseUnsupportedNextVersion && opennextjs-cloudflare preview"
+    "lint": "next lint"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

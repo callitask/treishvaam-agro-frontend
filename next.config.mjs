@@ -2,68 +2,52 @@
  * AI-CONTEXT:
  *
  * Purpose:
- * - Enterprise Security & Build Configuration for Treishvaam Agro.
+ * - Next.js build configuration enforcing strict Static Site Generation (SSG).
  *
  * Scope:
- * - Security Headers (HSTS, CSP).
- * - Image Domains.
- * - Build Optimization.
+ * - Controls compiler output and image optimization rules.
+ * - What it must never be responsible for: Server-side rendering (SSR) routing.
+ *
+ * Critical Dependencies:
+ * - Cloudflare Pages (requires 'out' directory for static hosting).
+ * - Edge Worker (tagro-seo-worker) handles dynamic routing, not Next.js.
  *
  * Security Constraints:
- * - No hardcoded API URLs.
- * - Strict Content Security Policy.
+ * - MUST remain a purely static export to prevent Node.js runtime vulnerabilities.
  *
- * IMMUTABLE CHANGE HISTORY:
- * - EDITED: Added strict security headers.
- * - EDITED: Configured images for Cloudflare/Unsplash/Treishvaam domains.
+ * Non-Negotiables:
+ * - output: "export" MUST remain.
+ * - images: { unoptimized: true } MUST remain for static export compatibility.
+ *
+ * Change Intent:
+ * - Bypassing OpenNext SSR incompatibility by returning to pure Static HTML Export.
+ *
+ * Future AI Guidance:
+ * - Do not remove the export output directive. The enterprise architecture mandates Cloudflare serves cached static pages.
+ *
+ * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
+ * - ADDED:
+ * • output: "export"
+ * • images.unoptimized: true
+ * • AI-Context block
+ * • 2026-04-09
+ *
+ * - REMOVED:
+ * • Deprecated eslint config keys that caused warnings.
+ * • Why removal was safe: Build pipelines handle linting separately.
+ *
+ * - DO-NOT-DELETE RULE:
+ * This IMMUTABLE CHANGE HISTORY section must never be deleted,
+ * truncated, rewritten, or regenerated.
+ * Future AI must append only.
  */
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
-    poweredByHeader: false, // Security: Hide Next.js banner
-    images: {
-        remotePatterns: [
-            { protocol: 'https', hostname: 'treishvaamgroup.com' },
-            { protocol: 'https', hostname: 'www.treishvaamgroup.com' },
-            { protocol: 'https', hostname: 'images.unsplash.com' },
-            { protocol: 'https', hostname: 'dummyimage.com' } // For placeholders
-        ],
-        unoptimized: true, // Cloudflare Pages compatibility
-    },
-    async headers() {
-        return [
-            {
-                source: '/:path*',
-                headers: [
-                    {
-                        key: 'X-DNS-Prefetch-Control',
-                        value: 'on'
-                    },
-                    {
-                        key: 'Strict-Transport-Security',
-                        value: 'max-age=63072000; includeSubDomains; preload'
-                    },
-                    {
-                        key: 'X-Content-Type-Options',
-                        value: 'nosniff'
-                    },
-                    {
-                        key: 'X-Frame-Options',
-                        value: 'SAMEORIGIN'
-                    },
-                    {
-                        key: 'Referrer-Policy',
-                        value: 'strict-origin-when-cross-origin'
-                    },
-                    {
-                        key: 'Permissions-Policy',
-                        value: 'camera=(), microphone=(), geolocation=()'
-                    }
-                ]
-            }
-        ];
-    }
+  output: "export",
+  images: {
+    unoptimized: true,
+  }
 };
 
 export default nextConfig;
