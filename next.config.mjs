@@ -20,7 +20,7 @@
  * - images: { unoptimized: true } MUST remain for static export compatibility.
  *
  * Change Intent:
- * - Bypassing OpenNext SSR incompatibility by returning to pure Static HTML Export.
+ * - Explicitly enforcing SSG to bypass the OpenNext Cloudflare deployment loop.
  *
  * Future AI Guidance:
  * - Do not remove the export output directive. The enterprise architecture mandates Cloudflare serves cached static pages.
@@ -30,11 +30,10 @@
  * • output: "export"
  * • images.unoptimized: true
  * • AI-Context block
- * • 2026-04-09
+ * • 2026-04-10
  *
  * - REMOVED:
  * • Deprecated eslint config keys that caused warnings.
- * • Why removal was safe: Build pipelines handle linting separately.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,

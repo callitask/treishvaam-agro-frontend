@@ -5,7 +5,7 @@
   "type": "module",
   "__AI_CONTEXT__": {
     "Purpose": "Defines project dependencies and strict module resolution for Treishvaam Agro.",
-    "Non-Negotiables": "The 'type': 'module' directive must remain. The build scripts MUST use standard 'next build' for static exports, completely avoiding 'opennextjs-cloudflare'.",
+    "Non-Negotiables": "The 'type': 'module' directive must remain. The scripts block MUST NOT contain any 'deploy' or 'preview' commands using 'wrangler' or 'opennextjs'. It must strictly rely on standard 'next build'.",
     "IMMUTABLE_CHANGE_HISTORY": [
       {
         "ACTION": "ADDED",
@@ -21,9 +21,9 @@
       },
       {
         "ACTION": "REMOVED",
-        "DETAILS": "Removed opennextjs-cloudflare overrides from build scripts.",
-        "REASON": "OpenNext fundamentally conflicts with the Zero-Trust Static Edge architecture. Reverted to standard next build for pure SSG export.",
-        "DATE": "2026-04-09"
+        "DETAILS": "Completely scrubbed 'deploy' and 'preview' scripts.",
+        "REASON": "Cloudflare Pages CI/CD was automatically picking up 'npx wrangler deploy' and forcing an OpenNext migration, which crashed on Next.js 14. Removing these scripts forces Cloudflare to fall back to a standard static HTML build.",
+        "DATE": "2026-04-10"
       }
     ],
     "DO_NOT_DELETE_RULE": "This object must never be removed. Future AI must append to the history array."
