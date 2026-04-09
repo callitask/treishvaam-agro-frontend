@@ -2,6 +2,20 @@
   "name": "treishvaam-agro-frontend",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "__AI_CONTEXT__": {
+    "Purpose": "Defines project dependencies and strict module resolution for Treishvaam Agro.",
+    "Non-Negotiables": "The 'type': 'module' directive must remain to ensure Cloudflare/Turbopack processes Next.js files as ESModules, preventing the 'CommonJS vs EcmaScript Modules' build crash.",
+    "IMMUTABLE_CHANGE_HISTORY": [
+      {
+        "ACTION": "ADDED",
+        "DETAILS": "'type': 'module' injected.",
+        "REASON": "Cloudflare OpenNext build failed with 'Specified module format (CommonJs) is not matching the module format of the source code (EcmaScript Modules)'.",
+        "DATE": "2026-04-09"
+      }
+    ],
+    "DO_NOT_DELETE_RULE": "This object must never be removed. Future AI must append to the history array."
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

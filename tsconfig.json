@@ -1,5 +1,41 @@
+/*
+ * AI-CONTEXT:
+ *
+ * Purpose:
+ * - Enterprise TypeScript configuration for Treishvaam Agro frontend.
+ * - Controls module resolution, strict typing, and path aliases.
+ *
+ * Scope:
+ * - Build-time compilation and IDE intelligence.
+ * - What it must never be responsible for: Runtime logic.
+ *
+ * Critical Dependencies:
+ * - Frontend: Next.js 14+ (Turbopack compatible).
+ * - Cloudflare Pages: Requires absolute precision in module paths.
+ *
+ * Non-Negotiables:
+ * - "baseUrl": "." MUST be present for Turbopack to resolve absolute "@/*" paths.
+ *
+ * Change Intent:
+ * - Fixed Cloudflare Build Error (Module not found) by explicitly defining the base URL.
+ *
+ * Future AI Guidance:
+ * - Do not remove the baseUrl directive; it will instantly break Cloudflare OpenNext builds.
+ *
+ * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
+ * - ADDED:
+ * • "baseUrl": "." to compilerOptions.
+ * • Why it was added: Turbopack failed with 14 errors unable to resolve '@/components/...'.
+ * • 2026-04-09
+ *
+ * - DO-NOT-DELETE RULE:
+ * This IMMUTABLE CHANGE HISTORY section must never be deleted,
+ * truncated, rewritten, or regenerated.
+ * Future AI must append only.
+ */
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
