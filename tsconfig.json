@@ -15,18 +15,25 @@
  *
  * Non-Negotiables:
  * - "baseUrl": "." MUST be present for Turbopack to resolve absolute "@/*" paths.
+ * - Deprecated directories (like _pages_old) MUST be excluded to prevent build crashes.
  *
  * Change Intent:
- * - Fixed Cloudflare Build Error (Module not found) by explicitly defining the base URL.
+ * - Excluding _pages_old to fix a Type Error where legacy files were attempting to import missing components (RFQForm).
  *
  * Future AI Guidance:
  * - Do not remove the baseUrl directive; it will instantly break Cloudflare OpenNext builds.
+ * - Do not remove _pages_old from the exclude array unless the legacy code is fixed and restored.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - ADDED:
  * • "baseUrl": "." to compilerOptions.
  * • Why it was added: Turbopack failed with 14 errors unable to resolve '@/components/...'.
  * • 2026-04-09
+ *
+ * - EDITED:
+ * • Added "_pages_old" to the exclude array.
+ * • Why the edit was required: The Next.js build crashed during the Type Checking phase because legacy files were referencing deleted components.
+ * • 2026-04-10
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -58,5 +65,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "_pages_old"]
 }
