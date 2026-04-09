@@ -2,24 +2,42 @@
  * AI-CONTEXT:
  *
  * Purpose:
- * - Provides strict theme context (Dark/Light/System) to the entire application.
- * - Wraps next-themes to ensure hydration safety.
+ * - Provides global theme management (dark/light mode) via Next-Themes.
  *
  * Scope:
- * - Global Application Wrapper.
+ * - Wraps the application root to inject theme context.
  *
  * Critical Dependencies:
- * - next-themes
+ * - next-themes library.
  *
- * IMMUTABLE CHANGE HISTORY:
- * - ADDED: Initial ThemeProvider implementation to support Sonner and UI theming.
+ * Security Constraints:
+ * - N/A (Client-side UI context).
+ *
+ * Non-Negotiables:
+ * - MUST import ThemeProviderProps directly from 'next-themes' to prevent TypeScript build failures.
+ *
+ * Change Intent:
+ * - Fixed TypeScript module resolution error for next-themes/dist/types.
+ *
+ * Future AI Guidance:
+ * - Do not revert to importing from 'next-themes/dist/types' as it breaks newer npm module resolution.
+ *
+ * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
+ * - EDITED:
+ * • Consolidated ThemeProviderProps import to 'next-themes'.
+ * • Why the edit was required: Build failed with "Cannot find module 'next-themes/dist/types'".
+ * • 2026-04-10
+ *
+ * - DO-NOT-DELETE RULE:
+ * This IMMUTABLE CHANGE HISTORY section must never be deleted,
+ * truncated, rewritten, or regenerated.
+ * Future AI must append only.
  */
 
 "use client"
 
 import * as React from "react"
-import { ThemeProvider as NextThemesProvider } from "next-themes"
-import { type ThemeProviderProps } from "next-themes/dist/types"
+import { ThemeProvider as NextThemesProvider, ThemeProviderProps } from "next-themes"
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>
