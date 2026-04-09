@@ -18,6 +18,12 @@
         "DETAILS": "Upgraded 'next' and 'eslint-config-next' from 14.1.0 to 14.2.35.",
         "REASON": "Wrangler deploy failed with ERROR: The version of Next.js used in the project (14.1.0) cannot be automatically configured. Please update the Next.js version to at least 14.2.35.",
         "DATE": "2026-04-09"
+      },
+      {
+        "ACTION": "EDITED",
+        "DETAILS": "Enforced local package-lock.json regeneration.",
+        "REASON": "Cloudflare build failed during 'npm ci' due to out-of-sync lockfile after Next.js version bump. Lockfile sync is an absolute requirement for CI/CD environments.",
+        "DATE": "2026-04-09"
       }
     ],
     "DO_NOT_DELETE_RULE": "This object must never be removed. Future AI must append to the history array."
