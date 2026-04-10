@@ -16,26 +16,18 @@
  * - Purely presentation logic. Zero security risk surface.
  *
  * Non-Negotiables:
- * - Must remain a .js file. Cloudflare Pages CI/CD fails to parse .ts configs under strict ESM rules, resulting in unstyled deployments.
- * - All semantic classes used in the HTML (gold, offWhite, textDark) MUST map to hex codes here.
+ * - Must remain a .cjs file. The Next.js environment on Cloudflare Pages requires CommonJS to synchronously parse the plugin array and generate the CSS output without failing silently.
  *
  * Change Intent:
- * - Fixed `tailwindcss-animate` import. `import()` returns a Promise in ESM, which PostCSS cannot execute synchronously. Replaced with static top-level import to restore full CSS generation.
+ * - Converted from ESM (.js) to CommonJS (.cjs) and switched to `require()` to guarantee CSS generation.
  *
  * Future AI Guidance:
- * - Do not convert back to .ts unless a dedicated transpiler is added to the build pipeline.
+ * - Do not convert back to .ts or .mjs unless a dedicated transpiler is added to the build pipeline.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - EDITED:
- * • Mapped missing HTML-specific brand colors (textDark, textMuted, border, gold, goldHover, offWhite).
- * • 2026-04-10
- *
- * - RENAMED & EDITED:
- * • Converted from tailwind.config.ts to tailwind.config.js.
- * • 2026-04-10
- *
- * - EDITED:
- * • Changed dynamic `import("tailwindcss-animate")` to static top-level `import tailwindcssAnimate` to fix empty CSS output during Cloudflare build.
+ * - EDITED & RENAMED:
+ * • Converted to CommonJS (.cjs) and replaced `import` with `require("tailwindcss-animate")`.
+ * • Why the edit was required: The ESM version silently crashed PostCSS on Cloudflare, resulting in an empty stylesheet and unstyled HTML.
  * • 2026-04-11
  *
  * - DO-NOT-DELETE RULE:
@@ -44,10 +36,8 @@
  * Future AI must append only.
  */
 
-import tailwindcssAnimate from "tailwindcss-animate";
-
 /** @type {import('tailwindcss').Config} */
-const config = {
+module.exports = {
   darkMode: ["class"],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -153,7 +143,5 @@ const config = {
       }
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [require("tailwindcss-animate")],
 };
-
-export default config;
