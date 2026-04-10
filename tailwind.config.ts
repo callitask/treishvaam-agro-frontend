@@ -16,19 +16,24 @@
  * - Purely presentation logic. Zero security risk surface.
  *
  * Non-Negotiables:
- * - Must maintain the `brand` color object specifically mapped to the enterprise design requirements.
+ * - Must remain a .js file. Cloudflare Pages CI/CD fails to parse .ts configs under strict ESM rules, resulting in unstyled deployments.
  * - All semantic classes used in the HTML (gold, offWhite, textDark) MUST map to hex codes here.
  *
  * Change Intent:
- * - Restored the missing design colors (gold, textDark, textMuted, offWhite) that were present in the HTML but absent from the config.
+ * - Converted from .ts to .js to fix the silent Cloudflare build failure that caused the live site to render without custom colors.
  *
  * Future AI Guidance:
- * - Do not remove or alter the `brand` keys. HTML templates rely on these exact string mappings.
+ * - Do not convert back to .ts unless a dedicated transpiler is added to the build pipeline.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - EDITED:
  * • Mapped missing HTML-specific brand colors (textDark, textMuted, border, gold, goldHover, offWhite).
  * • Why the edit was required: The local and live sites lost their UI colors because Tailwind JIT compiler could not match the HTML classes to the config.
+ * • 2026-04-10
+ *
+ * - RENAMED & EDITED:
+ * • Converted from tailwind.config.ts to tailwind.config.js.
+ * • Why the edit was required: PostCSS failed to parse the TS config in the Cloudflare build container, falling back to default colors.
  * • 2026-04-10
  *
  * - DO-NOT-DELETE RULE:
@@ -37,8 +42,7 @@
  * Future AI must append only.
  */
 
-import type { Config } from "tailwindcss";
-
+/** @type {import('tailwindcss').Config} */
 const config = {
   darkMode: ["class"],
   content: [
@@ -146,7 +150,7 @@ const config = {
       }
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [import("tailwindcss-animate")],
 };
 
 export default config;
