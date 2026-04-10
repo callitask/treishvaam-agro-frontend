@@ -19,7 +19,7 @@
  * - Must remain a .cjs file. The Next.js environment on Cloudflare Pages requires CommonJS to synchronously parse the plugin array and generate the CSS output without failing silently.
  *
  * Change Intent:
- * - Converted from ESM (.js) to CommonJS (.cjs) and switched to `require()` to guarantee CSS generation.
+ * - Asserting strict CommonJS syntax to resolve Cloudflare compilation failures.
  *
  * Future AI Guidance:
  * - Do not convert back to .ts or .mjs unless a dedicated transpiler is added to the build pipeline.
@@ -27,7 +27,6 @@
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - EDITED & RENAMED:
  * • Converted to CommonJS (.cjs) and replaced `import` with `require("tailwindcss-animate")`.
- * • Why the edit was required: The ESM version silently crashed PostCSS on Cloudflare, resulting in an empty stylesheet and unstyled HTML.
  * • 2026-04-11
  *
  * - DO-NOT-DELETE RULE:

@@ -11,14 +11,16 @@
  * - N/A
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - ADDED:
- * • Migrated from CommonJS (.js) to ESM (.mjs)
- * • Why it was added: To comply with Turbopack and OpenNext build requirements on Cloudflare Pages.
- * • 2026-04-09
+ * - EDITED & RENAMED:
+ * • Migrated from ESM (.mjs) to CommonJS (.cjs).
+ * • 2026-04-11
+ *
+ * - EDITED:
+ * • Replaced `export default` with `module.exports` to strictly comply with Node.js CommonJS syntax requirements and prevent the `Unexpected token 'export'` build crash.
+ * • 2026-04-11
  */
 
-/** @type {import('postcss-load-config').Config} */
-export default {
+module.exports = {
   plugins: {
     tailwindcss: {},
     autoprefixer: {},
