@@ -5,7 +5,7 @@
   "type": "module",
   "__AI_CONTEXT__": {
     "Purpose": "Defines project dependencies and strict module resolution for Treishvaam Agro.",
-    "Non-Negotiables": "The 'type': 'module' directive must remain. The scripts block MUST NOT contain any 'deploy' or 'preview' commands using 'wrangler' or 'opennextjs'. It must strictly rely on standard 'next build'.",
+    "Non-Negotiables": "The 'type': 'module' directive must remain. SEE AI_WORKFLOW.md FOR STRICT DEPLOYMENT COMMANDS AND DIRECTORY PATHS.",
     "IMMUTABLE_CHANGE_HISTORY": [
       {
         "ACTION": "ADDED",
@@ -23,6 +23,12 @@
         "ACTION": "REMOVED",
         "DETAILS": "Completely scrubbed 'deploy' and 'preview' scripts.",
         "REASON": "Cloudflare Pages CI/CD was automatically picking up 'npx wrangler deploy' and forcing an OpenNext migration, which crashed on Next.js 14. Removing these scripts forces Cloudflare to fall back to a standard static HTML build.",
+        "DATE": "2026-04-10"
+      },
+      {
+        "ACTION": "ADDED",
+        "DETAILS": "Created AI_WORKFLOW.md and referenced it here.",
+        "REASON": "To permanently anchor exact directory paths, branch names, and Wrangler/Git commands for all future AI executions, preventing infrastructure deployment cross-contamination.",
         "DATE": "2026-04-10"
       }
     ],
