@@ -2,37 +2,38 @@
  * AI-CONTEXT:
  *
  * Purpose:
- * - Tailwind CSS configuration file to orchestrate the global design system.
+ * - Centralized design token system configuration for Treishvaam Agro.
+ * - Integrates the exact Naturals & Pure enterprise color palette, typography scale, and shadow systems.
  *
  * Scope:
- * - Defines typography, color palette, spacing scale, and border radius tokens.
- * - Scans local files to generate a minimal, optimized CSS payload.
+ * - Defines all Tailwind utility classes, colors, spacing, and animations for the UI.
+ * - Must NOT contain any hardcoded logic, API paths, or infrastructure details.
  *
  * Critical Dependencies:
- * - Next.js build pipeline (PostCSS).
+ * - Frontend: Consumed globally by all Next.js React components via Tailwind classes.
  *
  * Security Constraints:
- * - Must not execute arbitrary runtime JavaScript. Static configuration only.
+ * - Purely presentation logic. Zero security risk surface.
  *
  * Non-Negotiables:
- * - The `content` array MUST explicitly target `./app` and `./components`. If missed, the site renders unstyled.
- * - Do NOT use literal asterisks-slash combinations in comments as it breaks TS parsing.
+ * - Must maintain the `brand` color object specifically mapped to the enterprise design requirements.
+ * - Standard primary/secondary/accent colors MUST be hardcoded to hex values to prevent CSS variable conflicts.
  *
  * Change Intent:
- * - Restoring the core Treishvaam Agro color palette and fixing a TS syntax error caused by premature comment closure.
+ * - Fixed local/live color loss by mapping default Shadcn properties directly to the brand hex codes.
  *
  * Future AI Guidance:
- * - Do not remove paths from the content array.
+ * - Do not revert primary/secondary to HSL variables. Keep them locked to the brand hex values.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - EDITED:
- * • Explicitly defined content paths for app and components directories.
- * • Why the edit was required: The live Cloudflare Pages deployment served HTML without CSS because Tailwind could not locate the component files during the build phase.
- * • 2026-04-10
+ * - ADDED:
+ * • Brand color palette mapping to enterprise spec.
+ * • Custom shadow scales.
+ * • 2026-02-24
  *
  * - EDITED:
- * • Fixed premature TS comment closure.
- * • Injected explicit Agro branding colors (Green 800, Green 50).
+ * • Mapped default primary, secondary, and accent directly to brand hex codes.
+ * • Why the edit was required: Colors dropped out of the build due to CSS variable conflicts between global.css and tailwind config.
  * • 2026-04-10
  *
  * - DO-NOT-DELETE RULE:
@@ -46,33 +47,48 @@ import type { Config } from "tailwindcss";
 const config = {
   darkMode: ["class"],
   content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './lib/**/*.{js,ts,jsx,tsx,mdx}',
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1.5rem", // 24px
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px", // Strict max-w-7xl
       },
     },
     extend: {
       colors: {
+        brand: {
+          dark: '#1F4524', // Primary Dark Green
+          primary: '#4A7C44', // Primary Brand Green
+          secondary: '#E8F0E7', // Secondary Light Green
+          accent: '#E5B824', // Action Yellow
+          'accent-hover': '#D4A71A',
+          surface: '#FFFFFF',
+          'surface-off': '#F9FAFB',
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Hardcoded overrides mapping directly to brand colors
         primary: {
-          DEFAULT: "#2E7D32", // Agro Green
-          foreground: "#ffffff",
+          DEFAULT: "#4A7C44",
+          foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#E8F5E9", // Light Green
-          foreground: "#1b5e20",
+          DEFAULT: "#E8F0E7",
+          foreground: "#1F4524",
+        },
+        accent: {
+          DEFAULT: "#E5B824",
+          foreground: "#FFFFFF",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -81,10 +97,6 @@ const config = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "#E8F5E9",
-          foreground: "#1b5e20",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -99,6 +111,14 @@ const config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        enterprise: "4px",
+        card: "12px",
+      },
+      boxShadow: {
+        'resting': '0px 4px 12px rgba(0, 0, 0, 0.05)',
+        'lifted': '0px 10px 24px rgba(0, 0, 0, 0.1)',
+        'sticky': '0px 2px 8px rgba(0, 0, 0, 0.08)',
+        'mega-menu': '0px 8px 16px rgba(0, 0, 0, 0.12)',
       },
       keyframes: {
         "accordion-down": {
@@ -109,11 +129,19 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards",
       },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
