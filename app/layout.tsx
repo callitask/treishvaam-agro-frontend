@@ -6,8 +6,7 @@
  * - Serves as the global HTML wrapper and entry point for all stylesheets.
  *
  * Change Intent:
- * - Injected `<Navbar />` and `<Footer />` directly into the body.
- * - This guarantees they appear on every single page and prevents hydration flickering.
+ * - Updated metadata to reflect enterprise hierarchy and parent organization link.
  */
 
 import type { Metadata } from 'next';
@@ -20,7 +19,17 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Treishvaam Agro | Enterprise Naturals & Pure Ingredients',
-  description: 'Global leaders in sustainably sourced, meticulously processed agricultural powders for the B2B enterprise market.',
+  description: 'Global leaders in sustainably sourced, meticulously processed agricultural powders for the B2B enterprise market. A Treishvaam Group company.',
+  keywords: ['agricultural powders', 'organic extracts', 'B2B ingredients', 'Treishvaam Agro', 'natural powders'],
+  authors: [{ name: 'Amitsagar Kandpal' }],
+  openGraph: {
+    title: 'Treishvaam Agro | Enterprise Naturals',
+    description: 'Pure organic agricultural ingredients for global manufacturing.',
+    url: 'https://tagro.treishvaamgroup.com',
+    siteName: 'Treishvaam Agro',
+    images: [{ url: 'https://treishvaamgroup.com/logo512.webp' }],
+    type: 'website',
+  },
 };
 
 export default function RootLayout({
