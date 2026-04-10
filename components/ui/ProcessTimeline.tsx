@@ -27,15 +27,38 @@
  * - EDITED:
  * • Implemented alternating layout.
  * • Added floating absolute numbered badges logic (`absolute -top-4 -left-4`).
+ * * - EDITED:
+ * • Replaced text placeholders ("Image 1") with production-ready `img` tags mapped to high-quality Unsplash URLs.
+ * • 2026-04-10
  */
 
 import React from 'react';
 
 const STAGES = [
-  { id: 1, title: 'Quality Selection', desc: 'Rigorous sorting of raw materials at the farm level to ensure only the highest grade enters the facility.' },
-  { id: 2, title: 'Washing & Sanitization', desc: 'Multi-stage aqueous ozone washing to remove all impurities and microbial loads naturally.' },
-  { id: 3, title: 'Peeling & Slicing', desc: 'Precision mechanical processing to prepare the raw material for uniform dehydration.' },
-  { id: 4, title: 'Tunnel Drying', desc: 'Controlled low-temperature dehydration to preserve volatile oils, color, and complete nutritional profile.' },
+  { 
+    id: 1, 
+    title: 'Quality Selection', 
+    desc: 'Rigorous sorting of raw materials at the farm level to ensure only the highest grade enters the facility.',
+    image: 'https://images.unsplash.com/photo-1592982537447-6f2a6a0a3023?q=80&w=2070&auto=format&fit=crop'
+  },
+  { 
+    id: 2, 
+    title: 'Washing & Sanitization', 
+    desc: 'Multi-stage aqueous ozone washing to remove all impurities and microbial loads naturally.',
+    image: 'https://images.unsplash.com/photo-1576045057995-568f588f82fb?q=80&w=1000&auto=format&fit=crop'
+  },
+  { 
+    id: 3, 
+    title: 'Peeling & Slicing', 
+    desc: 'Precision mechanical processing to prepare the raw material for uniform dehydration.',
+    image: 'https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=1000&auto=format&fit=crop'
+  },
+  { 
+    id: 4, 
+    title: 'Tunnel Drying', 
+    desc: 'Controlled low-temperature dehydration to preserve volatile oils, color, and complete nutritional profile.',
+    image: 'https://images.unsplash.com/photo-1615486171448-4357778b4bdc?q=80&w=1000&auto=format&fit=crop'
+  },
 ];
 
 export default function ProcessTimeline() {
@@ -51,7 +74,6 @@ export default function ProcessTimeline() {
 
         {/* Timeline ZigZag */}
         <div className="flex flex-col gap-24 relative">
-          {/* Optional: Central connecting line for desktop could go here, omitting for exact visual match of blocks */}
           
           {STAGES.map((stage, index) => {
             const isEven = index % 2 === 1; // 0-indexed, so 1,3 are even visually
@@ -60,15 +82,17 @@ export default function ProcessTimeline() {
                 
                 {/* Image Wrapper */}
                 <div className="w-full md:w-1/2 relative">
-                  <div className="relative aspect-video bg-gray-100 rounded-2xl shadow-sm border border-brand-border">
+                  <div className="relative aspect-video bg-gray-100 rounded-2xl shadow-sm border border-brand-border overflow-hidden group">
                     {/* Floating Number Badge */}
                     <div className="absolute -top-5 -left-5 w-12 h-12 bg-brand-gold text-white flex items-center justify-center rounded-full text-xl font-bold shadow-lg z-10">
                       {stage.id}
                     </div>
-                    {/* Image placeholder */}
-                    <div className="w-full h-full flex items-center justify-center text-gray-400">
-                      Image {stage.id}
-                    </div>
+                    {/* Image */}
+                    <img 
+                      src={stage.image} 
+                      alt={stage.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
                   </div>
                 </div>
 
