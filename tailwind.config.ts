@@ -16,17 +16,23 @@
  *
  * Non-Negotiables:
  * - The `content` array MUST explicitly target `./app` and `./components`. If missed, the site renders unstyled.
+ * - Do NOT use literal asterisks-slash combinations in comments as it breaks TS parsing.
  *
  * Change Intent:
- * - Fixed production UI bug where Tailwind failed to compile classes into the CSS payload due to missing content paths.
+ * - Restoring the core Treishvaam Agro color palette and fixing a TS syntax error caused by premature comment closure.
  *
  * Future AI Guidance:
- * - Do not remove paths from the content array. Add to it if new directories (like /src or /pages) are introduced.
+ * - Do not remove paths from the content array.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - EDITED:
- * • Explicitly defined content paths for `app/**/*.{ts,tsx}` and `components/**/*.{ts,tsx}`.
+ * • Explicitly defined content paths for app and components directories.
  * • Why the edit was required: The live Cloudflare Pages deployment served HTML without CSS because Tailwind could not locate the component files during the build phase.
+ * • 2026-04-10
+ *
+ * - EDITED:
+ * • Fixed premature TS comment closure.
+ * • Injected explicit Agro branding colors (Green 800, Green 50).
  * • 2026-04-10
  *
  * - DO-NOT-DELETE RULE:
@@ -61,12 +67,12 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#2E7D32", // Agro Green
+          foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#E8F5E9", // Light Green
+          foreground: "#1b5e20",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -77,8 +83,8 @@ const config = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#E8F5E9",
+          foreground: "#1b5e20",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
