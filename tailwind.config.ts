@@ -17,23 +17,18 @@
  *
  * Non-Negotiables:
  * - Must maintain the `brand` color object specifically mapped to the enterprise design requirements.
- * - Standard primary/secondary/accent colors MUST be hardcoded to hex values to prevent CSS variable conflicts.
+ * - All semantic classes used in the HTML (gold, offWhite, textDark) MUST map to hex codes here.
  *
  * Change Intent:
- * - Fixed local/live color loss by mapping default Shadcn properties directly to the brand hex codes.
+ * - Restored the missing design colors (gold, textDark, textMuted, offWhite) that were present in the HTML but absent from the config.
  *
  * Future AI Guidance:
- * - Do not revert primary/secondary to HSL variables. Keep them locked to the brand hex values.
+ * - Do not remove or alter the `brand` keys. HTML templates rely on these exact string mappings.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - ADDED:
- * • Brand color palette mapping to enterprise spec.
- * • Custom shadow scales.
- * • 2026-02-24
- *
  * - EDITED:
- * • Mapped default primary, secondary, and accent directly to brand hex codes.
- * • Why the edit was required: Colors dropped out of the build due to CSS variable conflicts between global.css and tailwind config.
+ * • Mapped missing HTML-specific brand colors (textDark, textMuted, border, gold, goldHover, offWhite).
+ * • Why the edit was required: The local and live sites lost their UI colors because Tailwind JIT compiler could not match the HTML classes to the config.
  * • 2026-04-10
  *
  * - DO-NOT-DELETE RULE:
@@ -47,37 +42,44 @@ import type { Config } from "tailwindcss";
 const config = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "1.5rem", // 24px
+      padding: "1.5rem",
       screens: {
-        "2xl": "1280px", // Strict max-w-7xl
+        "2xl": "1280px",
       },
     },
     extend: {
       colors: {
         brand: {
-          dark: '#1F4524', // Primary Dark Green
-          primary: '#4A7C44', // Primary Brand Green
-          secondary: '#E8F0E7', // Secondary Light Green
-          accent: '#E5B824', // Action Yellow
+          dark: '#1F4524',
+          primary: '#4A7C44',
+          secondary: '#E8F0E7',
+          accent: '#E5B824',
           'accent-hover': '#D4A71A',
           surface: '#FFFFFF',
           'surface-off': '#F9FAFB',
+          
+          // Legacy mappings to restore missing HTML styling
+          textDark: '#1F4524',
+          textMuted: '#4B5563',
+          border: '#E5E7EB',
+          gold: '#E5B824',
+          goldHover: '#D4A71A',
+          offWhite: '#F9FAFB',
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        // Hardcoded overrides mapping directly to brand colors
         primary: {
           DEFAULT: "#4A7C44",
           foreground: "#FFFFFF",
@@ -145,6 +147,6 @@ const config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-} satisfies Config;
+};
 
 export default config;
