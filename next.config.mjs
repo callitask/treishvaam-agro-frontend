@@ -21,6 +21,7 @@
  *
  * Change Intent:
  * - Explicitly enforcing SSG to bypass the OpenNext Cloudflare deployment loop.
+ * - Configured remotePatterns for images.unsplash.com to resolve external asset loading blockages.
  *
  * Future AI Guidance:
  * - Do not remove the export output directive. The enterprise architecture mandates Cloudflare serves cached static pages.
@@ -31,6 +32,11 @@
  * • images.unoptimized: true
  * • AI-Context block
  * • 2026-04-10
+ *
+ * - EDITED:
+ * • Added remotePatterns array to images configuration.
+ * • Why the edit was required: To whitelist Unsplash image domains and prevent fetch errors in browser/GSC.
+ * • 2026-04-11
  *
  * - REMOVED:
  * • Deprecated eslint config keys that caused warnings.
@@ -46,6 +52,12 @@ const nextConfig = {
   output: "export",
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
   }
 };
 

@@ -17,12 +17,14 @@
  *
  * Non-Negotiables:
  * - MUST export generateStaticParams() returning an array of objects with the dynamic route segment (e.g., { id: string }).
+ * - MUST set dynamicParams = false to prevent edge RSC fetch errors for non-existent routes.
  *
  * Change Intent:
  * - Resolved Cloudflare Next.js build crash: `Error: Page "/products/[id]" is missing "generateStaticParams()" so it cannot be used with "output: export" config.`
+ * - Added `dynamicParams = false` to resolve GSC RSC payload crawl errors.
  *
  * Future AI Guidance:
- * - When launching any new frontend (like Treishvaam Hiring Marketplace), if the architecture enforces `output: "export"`, ALL dynamic routes (like [id], [slug], etc.) MUST have a generateStaticParams() function.
+ * - When launching any new frontend (like Treishvaam Hiring Marketplace), if the architecture enforces `output: "export"`, ALL dynamic routes (like [id], [slug], etc.) MUST have a generateStaticParams() function AND dynamicParams = false.
  * - Do NOT attempt to remove this to use SSR. Cloudflare Pages (Static mode) strictly relies on these generated HTML files to remain highly available during backend downtime.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
@@ -31,6 +33,11 @@
  * • Implemented mapping over local products array to statically generate all IDs.
  * • Why it was added: Cloudflare Pages rejected the build when Next.js was forced into SSG mode (`output: export`) without explicit params for dynamic routes. This enforces the immutable, serverless Edge architecture requirement.
  * • 2026-04-10
+ *
+ * - EDITED:
+ * • Added `export const dynamicParams = false;`
+ * • Why the edit was required: Google Search Console reported XHR payload errors (e.g., `banana-powder.txt?_rsc=19zvn`) for old/invalid URLs. Forcing false ensures pure 404s at the edge rather than triggering Next.js client-side router attempts.
+ * • 2026-04-11
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -47,6 +54,9 @@ import { Separator } from "@/components/ui/separator";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { products } from "@/lib/data/products";
 import { notFound } from "next/navigation";
+
+// Strict SSG: Disables fallback generation and forces a 404 for any ID not returned by generateStaticParams
+export const dynamicParams = false;
 
 // 1. Generate Static Params for SSG (Critical for Cloudflare Pages Static Export)
 export async function generateStaticParams() {
