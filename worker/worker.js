@@ -28,6 +28,7 @@
  * - EDITED: Added HTMLRewriter logic for Schema.org injection and sitemap proxying. 2026-04-11
  * - EDITED: Fixed 404 Sitemap error by construction direct internal fetch URL. 2026-04-11
  * - EDITED: Rerouted sitemap requests to BACKEND_ORIGIN for dynamic generation, with fallback to Pages. 2026-04-11
+ * - EDITED: Proxied sanitized client headers (User-Agent, Accept) to Pages sitemap fallback fetch to prevent 403 blocks. 2026-04-12
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted.
@@ -108,9 +109,16 @@ export default {
          const internalPagesHost = new URL(pagesOrigin).hostname;
          const sitemapUrl = new URL(url.pathname, pagesOrigin);
          
+         // Fix: Preserve essential headers (User-Agent, etc.) to prevent 403 blocks from Pages
+         const fallbackHeaders = new Headers(request.headers);
+         for (const key of fallbackHeaders.keys()) {
+           if (key.toLowerCase().startsWith('cf-')) fallbackHeaders.delete(key);
+         }
+         fallbackHeaders.set('Host', internalPagesHost);
+         
          const sitemapResp = await fetch(sitemapUrl.toString(), {
            method: "GET",
-           headers: { 'Host': internalPagesHost },
+           headers: fallbackHeaders,
            cf: { cacheTtl: 3600, cacheEverything: true }
          });
          
