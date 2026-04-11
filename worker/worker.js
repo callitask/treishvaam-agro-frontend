@@ -19,6 +19,7 @@
  *
  * Change Intent:
  * - Routed sitemap requests to the shared backend to support dynamic, programmatic sitemap generation.
+ * - Refactored sitemap edge routing to utilize native native Block 3 routing on fallback to resolve strict 403s/404s.
  *
  * Future AI Guidance:
  * - Always use the raw `env.CF_PAGES_ORIGIN` hostname when fetching static assets from within the worker to avoid routing loops.
@@ -29,6 +30,8 @@
  * - EDITED: Fixed 404 Sitemap error by construction direct internal fetch URL. 2026-04-11
  * - EDITED: Rerouted sitemap requests to BACKEND_ORIGIN for dynamic generation, with fallback to Pages. 2026-04-11
  * - EDITED: Proxied sanitized client headers (User-Agent, Accept) to Pages sitemap fallback fetch to prevent 403 blocks. 2026-04-12
+ * - REMOVED: Isolated secondary fetch logic for Pages sitemaps. 
+ * - EDITED: Allowed sitemaps to drop naturally into standard routing (Block 3) while appending strict application/xml types. Resolves permanent edge fetch conflicts. 2026-04-12
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted.
@@ -73,10 +76,9 @@ export default {
       }
     }
 
-    // 2. SEO & Sitemap Continuity (Backend First, Fallback to Pages)
+    // 2. SEO & Sitemap Continuity (Primary: Backend Dynamic)
     if (url.pathname === "/sitemap.xml" || url.pathname.startsWith("/sitemap-")) {
       try {
-        // Primary Route: Fetch from Shared Backend
         const proxyUrl = new URL(request.url);
         const targetUrl = new URL(backendOrigin);
         proxyUrl.hostname = targetUrl.hostname;
@@ -101,39 +103,10 @@ export default {
            return new Response(backendResp.body, { status: 200, headers });
         }
       } catch (backendError) {
-         console.warn("Backend Sitemap Error, falling back to static Pages sitemap:", backendError);
+         console.warn("Backend Sitemap Error, falling back to Native Pages Routing:", backendError);
       }
-
-      // Fallback Route: Fetch static from Pages if backend fails
-       try {
-         const internalPagesHost = new URL(pagesOrigin).hostname;
-         const sitemapUrl = new URL(url.pathname, pagesOrigin);
-         
-         // Fix: Preserve essential headers (User-Agent, etc.) to prevent 403 blocks from Pages
-         const fallbackHeaders = new Headers(request.headers);
-         for (const key of fallbackHeaders.keys()) {
-           if (key.toLowerCase().startsWith('cf-')) fallbackHeaders.delete(key);
-         }
-         fallbackHeaders.set('Host', internalPagesHost);
-         
-         const sitemapResp = await fetch(sitemapUrl.toString(), {
-           method: "GET",
-           headers: fallbackHeaders,
-           cf: { cacheTtl: 3600, cacheEverything: true }
-         });
-         
-         if (sitemapResp.ok) {
-           const headers = new Headers(sitemapResp.headers);
-           headers.set("Content-Type", "application/xml; charset=utf-8");
-           headers.set("X-Source", "Edge-Origin-Fallback");
-           headers.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
-           return new Response(sitemapResp.body, { status: 200, headers });
-         }
-       } catch (e) {
-         console.error("Sitemap Fallback Error:", e);
-       }
-       
-       return new Response("Sitemap Error", { status: 404 });
+      // If backend fails, we do NOT return 404 here anymore.
+      // We fall straight through to Block 3 which securely maps standard requests to CF Pages.
     }
 
     // 3. Standard Pages Rendering with SEO Injection
@@ -182,6 +155,16 @@ export default {
                 }
             })
             .transform(response);
+    }
+
+    // SCENARIO B: NATIVE SITEMAP FALLBACK INJECTION
+    if (url.pathname === "/sitemap.xml" || url.pathname.startsWith("/sitemap-")) {
+        // Enforce proper MIME type and cache control on the native static response
+        const sitemapHeaders = new Headers(response.headers);
+        sitemapHeaders.set("Content-Type", "application/xml; charset=utf-8");
+        sitemapHeaders.set("X-Source", "Edge-Origin-Fallback-Native");
+        sitemapHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+        return new Response(response.body, { status: response.status, headers: sitemapHeaders });
     }
 
     return response;
