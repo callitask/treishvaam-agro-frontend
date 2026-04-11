@@ -18,8 +18,7 @@
  * - What must remain environment-driven: BACKEND_ORIGIN, CF_PAGES_ORIGIN.
  *
  * Change Intent:
- * - Routed sitemap requests to the shared backend to support dynamic, programmatic sitemap generation.
- * - Refactored sitemap edge routing to utilize native native Block 3 routing on fallback to resolve strict 403s/404s.
+ * - Hardened Block 3 sitemap fallback to strictly verify `response.ok` before injecting XML headers to prevent 404 page XML corruption.
  *
  * Future AI Guidance:
  * - Always use the raw `env.CF_PAGES_ORIGIN` hostname when fetching static assets from within the worker to avoid routing loops.
@@ -32,6 +31,7 @@
  * - EDITED: Proxied sanitized client headers (User-Agent, Accept) to Pages sitemap fallback fetch to prevent 403 blocks. 2026-04-12
  * - REMOVED: Isolated secondary fetch logic for Pages sitemaps. 
  * - EDITED: Allowed sitemaps to drop naturally into standard routing (Block 3) while appending strict application/xml types. Resolves permanent edge fetch conflicts. 2026-04-12
+ * - EDITED: Added `if (response.ok)` check in native sitemap fallback injection. Prevents 404 HTML responses from being misclassified and parsed as corrupted XML by Googlebot. 2026-04-12
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted.
@@ -105,8 +105,7 @@ export default {
       } catch (backendError) {
          console.warn("Backend Sitemap Error, falling back to Native Pages Routing:", backendError);
       }
-      // If backend fails, we do NOT return 404 here anymore.
-      // We fall straight through to Block 3 which securely maps standard requests to CF Pages.
+      // If backend fails, fall straight through to Block 3 which securely maps standard requests to CF Pages.
     }
 
     // 3. Standard Pages Rendering with SEO Injection
@@ -159,12 +158,15 @@ export default {
 
     // SCENARIO B: NATIVE SITEMAP FALLBACK INJECTION
     if (url.pathname === "/sitemap.xml" || url.pathname.startsWith("/sitemap-")) {
-        // Enforce proper MIME type and cache control on the native static response
-        const sitemapHeaders = new Headers(response.headers);
-        sitemapHeaders.set("Content-Type", "application/xml; charset=utf-8");
-        sitemapHeaders.set("X-Source", "Edge-Origin-Fallback-Native");
-        sitemapHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
-        return new Response(response.body, { status: response.status, headers: sitemapHeaders });
+        // Enforce proper MIME type ONLY if the file was found. 
+        // Prevents turning a 404 HTML page into corrupted XML.
+        if (response.ok) {
+            const sitemapHeaders = new Headers(response.headers);
+            sitemapHeaders.set("Content-Type", "application/xml; charset=utf-8");
+            sitemapHeaders.set("X-Source", "Edge-Origin-Fallback-Native");
+            sitemapHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+            return new Response(response.body, { status: response.status, headers: sitemapHeaders });
+        }
     }
 
     return response;
