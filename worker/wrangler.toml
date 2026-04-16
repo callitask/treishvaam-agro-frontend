@@ -4,24 +4,25 @@
 # - Configuration file for the Treishvaam Agro SEO Worker deployment.
 #
 # Scope:
-# - Defines environment bindings and compatibility dates.
-# - What it must never be responsible for: Holding actual production secrets or routing URLs.
+# - Defines environment bindings, routes, and compatibility dates.
+# - What it must never be responsible for: Holding actual production secrets or backend origins.
 #
 # Critical Dependencies:
-# - Connects the worker script to the specific Cloudflare domain route.
+# - Connects the worker script to the specific Cloudflare domain routes via the `routes` array.
 #
 # Security Constraints:
-# - ZERO HARDCODED URLS ALLOWED.
+# - ZERO HARDCODED URLS ALLOWED in variable injections.
 # - NO [vars] SECTION. All routing URLs (BACKEND_ORIGIN, CF_PAGES_ORIGIN) must be injected via `npx wrangler secret put` or Cloudflare Dashboard.
 #
 # Non-Negotiables:
 # - This file is committed to version control and must remain entirely agnostic of infrastructure endpoints.
 #
 # Change Intent:
-# - Eliminated hardcoded domains to enforce strict Zero-Trust Git security.
+# - Added explicit routes block to securely attach the temporary indexing test domain (udaybhai.com) while preserving production routing.
 #
 # Future AI Guidance:
 # - Do not add a [vars] section with actual URLs. Use wrangler secrets exclusively.
+# - Once the udaybhai.com indexing test is concluded, remove the associated patterns from the routes array.
 #
 # IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
 # - ADDED:
@@ -45,6 +46,12 @@
 # • Verified configuration supports the new worker logic that routes `/sitemap.xml` to the backend.
 # • 2026-04-11
 #
+# - EDITED:
+# • Added explicit `routes` array.
+# • Why the edit was required: To bind the worker to the temporary udaybhai.com test domain while ensuring tagro.treishvaamgroup.com is unaffected.
+# • What behavior must remain unchanged: Zero-trust secret execution.
+# • 2026-04-16
+#
 # - DO-NOT-DELETE RULE:
 # This IMMUTABLE CHANGE HISTORY section must never be deleted,
 # truncated, rewritten, or regenerated.
@@ -57,3 +64,9 @@ compatibility_date = "2024-03-20"
 # NOTE: STRICT ZERO-TRUST ENFORCEMENT
 # NO [vars] SECTION HERE. 
 # URLs are managed via "npx wrangler secret put"
+
+routes = [
+  { pattern = "tagro.treishvaamgroup.com/*", custom_domain = true },
+  { pattern = "udaybhai.com/*", custom_domain = true },
+  { pattern = "www.udaybhai.com/*", custom_domain = true }
+]
