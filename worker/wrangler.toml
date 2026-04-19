@@ -18,11 +18,11 @@
 # - This file is committed to version control and must remain entirely agnostic of infrastructure endpoints.
 #
 # Change Intent:
-# - Renamed worker from `tagro-seo-worker` to `treishvaamagro-seo-worker` to establish a pristine, decoupled infrastructure for the new domain.
+# - Reverted routing syntax from Custom Domains to standard Intercept Routes to prevent DNS collision with the underlying Pages project on the apex domain.
 #
 # Future AI Guidance:
 # - Do not add a [vars] section with actual URLs. Use wrangler secrets exclusively.
-# - NEVER append "/*" to patterns when custom_domain = true.
+# - Do NOT use `custom_domain = true` if the domain is already bound to a Pages project. Use standard string-based intercept routes instead.
 #
 # IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
 # - ADDED:
@@ -70,6 +70,15 @@
 # • What behavior must remain unchanged: Target routes remain on the treishvaamagro.com apex.
 # • 2026-04-19
 #
+# - FAILED / REJECTED ATTEMPTS:
+# • Attempted to use `custom_domain = true` for the new apex domains. Rejected by Cloudflare because the domains are already bound to the Pages project.
+#
+# - EDITED:
+# • Reverted `routes` array to standard wildcard string patterns.
+# • Why the edit was required: To deploy the worker as an intercept Route rather than a Custom Domain origin.
+# • What behavior must remain unchanged: Worker must intercept SEO requests.
+# • 2026-04-19
+#
 # - DO-NOT-DELETE RULE:
 # This IMMUTABLE CHANGE HISTORY section must never be deleted,
 # truncated, rewritten, or regenerated.
@@ -84,6 +93,6 @@ compatibility_date = "2024-03-20"
 # URLs are managed via "npx wrangler secret put"
 
 routes = [
-  { pattern = "treishvaamagro.com", custom_domain = true },
-  { pattern = "www.treishvaamagro.com", custom_domain = true }
+  "treishvaamagro.com/*",
+  "www.treishvaamagro.com/*"
 ]
