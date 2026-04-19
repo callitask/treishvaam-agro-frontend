@@ -18,7 +18,7 @@
 # - This file is committed to version control and must remain entirely agnostic of infrastructure endpoints.
 #
 # Change Intent:
-# - Migrated worker routing from the test domain/penalized subdomain to the new permanent authoritative apex domain.
+# - Renamed worker from `tagro-seo-worker` to `treishvaamagro-seo-worker` to establish a pristine, decoupled infrastructure for the new domain.
 #
 # Future AI Guidance:
 # - Do not add a [vars] section with actual URLs. Use wrangler secrets exclusively.
@@ -64,12 +64,18 @@
 # • What behavior must remain unchanged: Worker must intercept identical SEO requests on the new domain.
 # • 2026-04-19
 #
+# - EDITED:
+# • Changed worker `name` to `treishvaamagro-seo-worker`.
+# • Why the edit was required: To align DevOps namespace with the new domain and orphan the legacy subdomain worker instance.
+# • What behavior must remain unchanged: Target routes remain on the treishvaamagro.com apex.
+# • 2026-04-19
+#
 # - DO-NOT-DELETE RULE:
 # This IMMUTABLE CHANGE HISTORY section must never be deleted,
 # truncated, rewritten, or regenerated.
 # Future AI must append only.
 
-name = "tagro-seo-worker"
+name = "treishvaamagro-seo-worker"
 main = "worker.js"
 compatibility_date = "2024-03-20"
 
