@@ -30,6 +30,8 @@
 # • Initial wrangler.toml for treishvaamagro-seo-worker.
 # • Mapped TREISHFIN_SEO_CACHE KV namespace to inherit established SEO caching.
 # • Phase 1 (Agro Edge Architecture).
+# - EDITED:
+# • Corrected KV namespace ID to match production.
 #
 # - DO-NOT-DELETE RULE:
 # This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -44,4 +46,4 @@ compatibility_date = "2024-03-20"
 
 [[kv_namespaces]]
 binding = "TREISHFIN_SEO_CACHE"
-id = "035cdbfcc43048999ea6e8f47c32cf97"
+id = "8e80f838a11349b2afddeece7c656d76"

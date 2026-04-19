@@ -3,11 +3,13 @@
  *
  * Purpose:
  * - Edge-side SEO rendering, high-availability fallback, and dynamic sitemap interception for Treishvaam Agro.
+ * - Secure API Reverse Proxy for dynamic Next.js frontend fetching.
  *
  * Scope:
  * - Intercepts requests to inject JSON-LD schema via HTMLRewriter.
  * - Serves cached dynamic sitemaps from TREISHFIN_SEO_CACHE (Free-tier optimized KV).
  * - Proxies valid standard requests to Cloudflare Pages securely.
+ * - Intercepts /api/* requests and proxies them to the shared backend with tenant isolation.
  * - Must never handle canonicalization (www -> apex), which is managed via Cloudflare Bulk Redirects.
  *
  * Critical Dependencies:
@@ -17,14 +19,14 @@
  *
  * Security Constraints:
  * - NO hardcoded URLs or backend origins. All routing relies on CF_PAGES_ORIGIN and BACKEND_ORIGIN environments.
- * - Tenant isolation must be strictly enforced via X-Tenant-ID header.
+ * - Tenant isolation must be strictly enforced via X-Tenant-ID header on all backend fetches.
  *
  * Non-Negotiables:
  * - Preserve Free Tier KV quota: Handle cache misses gracefully and update via ctx.waitUntil.
  * - Fail open: If KV or Backend fails, standard Pages requests must still execute.
  *
  * Change Intent:
- * - Phase 1: Deploy SEO edge architecture and KV caching strategy for Agro frontend.
+ * - Phase 3: Added secure API reverse proxy for dynamic frontend integration.
  *
  * Future AI Guidance:
  * - Do not bypass the KV cache for sitemaps.
@@ -37,6 +39,11 @@
  * • Read-through KV caching for sitemaps with asynchronous fallback to backend proxy.
  * • Tenant isolation headers (X-Tenant-ID: agro).
  * • Date / Phase: Phase 1 (Agro Edge Architecture).
+ *
+ * - EDITED:
+ * • Added handleApiProxy to securely route /api/* requests to the backend.
+ * • Enforced X-Tenant-ID: agro on all API requests.
+ * • Date / Phase: Phase 3 (Backend Dynamic Integration).
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -59,8 +66,46 @@ export default {
             return await handleRobots(request, env);
         }
 
+        // API Reverse Proxy: Zero-Trust Backend Communication
+        if (path.startsWith('/api/')) {
+            return await handleApiProxy(request, env, url);
+        }
+
         // Standard Page Request with Schema Injection & Fallback
         return await handleHtmlProxy(request, env, ctx, url);
+    }
+}
+
+async function handleApiProxy(request, env, url) {
+    const backendOrigin = env.BACKEND_ORIGIN;
+    if (!backendOrigin) {
+        return new Response(JSON.stringify({ error: "Backend origin not configured." }), { 
+            status: 500, 
+            headers: { 'Content-Type': 'application/json' } 
+        });
+    }
+
+    const backendUrl = new URL(request.url);
+    const backendOriginUrl = new URL(backendOrigin);
+    backendUrl.hostname = backendOriginUrl.hostname;
+    backendUrl.protocol = backendOriginUrl.protocol;
+    backendUrl.port = backendOriginUrl.port || '';
+
+    const proxyReq = new Request(backendUrl.toString(), request);
+    
+    // Zero-Trust Tenant Isolation
+    proxyReq.headers.set('X-Tenant-ID', 'agro'); 
+    proxyReq.headers.set('X-Forwarded-Host', url.hostname);
+
+    try {
+        const response = await fetch(proxyReq);
+        // Pass through the backend response exactly as-is to the frontend
+        return new Response(response.body, response);
+    } catch (error) {
+        return new Response(JSON.stringify({ error: "Backend API temporarily unreachable." }), { 
+            status: 503,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 }
 
