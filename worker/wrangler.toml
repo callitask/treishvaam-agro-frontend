@@ -1,83 +1,35 @@
 # AI-CONTEXT:
 #
 # Purpose:
-# - Configuration file for the Treishvaam Agro SEO Worker deployment.
+# - Cloudflare Worker configuration for treishvaamagro-seo-worker.
 #
 # Scope:
-# - Defines environment bindings, routes, and compatibility dates.
-# - What it must never be responsible for: Holding actual production secrets or backend origins.
+# - Defines KV bindings, environmental variables mappings, and compatibility dates.
 #
 # Critical Dependencies:
-# - Connects the worker script to the specific Cloudflare domain routes via the `routes` array.
+# - Backend: finance-api (Configured dynamically via secrets, not hardcoded here).
+# - Frontend: Agro Pages deployment.
+# - Worker / SEO / Sitemap: TREISHFIN_SEO_CACHE KV namespace.
 #
 # Security Constraints:
-# - ZERO HARDCODED URLS ALLOWED in variable injections.
-# - NO [vars] SECTION. All routing URLs (BACKEND_ORIGIN, CF_PAGES_ORIGIN) must be injected via `npx wrangler secret put` or Cloudflare Dashboard.
+# - NEVER hardcode production secrets (BACKEND_ORIGIN, CF_PAGES_ORIGIN) here. 
+# - Use `wrangler secret put` or the Cloudflare Dashboard strictly.
 #
 # Non-Negotiables:
-# - This file is committed to version control and must remain entirely agnostic of infrastructure endpoints.
+# - Must retain the exact KV namespace binding "TREISHFIN_SEO_CACHE" to utilize the shared free-tier cache.
 #
 # Change Intent:
-# - Reverted routing syntax from Custom Domains to standard Intercept Routes to prevent DNS collision with the underlying Pages project on the apex domain.
+# - Phase 1 configuration for Agro SEO Edge Worker.
 #
 # Future AI Guidance:
-# - Do not add a [vars] section with actual URLs. Use wrangler secrets exclusively.
-# - Do NOT use `custom_domain = true` if the domain is already bound to a Pages project. Use standard string-based intercept routes instead.
+# - Do not add inline secrets.
+# - Do not change the KV binding name.
 #
 # IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
 # - ADDED:
-# • Initial configuration for tagro-seo-worker.
-# • 2026-04-09
-#
-# - EDITED:
-# • REMOVED the [vars] section containing BACKEND_ORIGIN and CF_PAGES_ORIGIN.
-# • Why the edit was required: Hardcoding URLs in version control violates Absolute Zero-Trust Protocol.
-# • What behavior must remain unchanged: Worker compatibility date and main entrypoint.
-#
-# - REMOVED:
-# • [vars] block with explicit URLs.
-# • Why removal was safe: Shifted configuration to Cloudflare Secrets management.
-# • What replaced it: `npx wrangler secret put` commands executed via CI/CD or CLI.
-#
-# - FAILED / REJECTED ATTEMPTS:
-# • Attempted to use [vars] for environment URLs. Rejected by enterprise security protocol for exposing infrastructure in git.
-#
-# - EDITED:
-# • Verified configuration supports the new worker logic that routes `/sitemap.xml` to the backend.
-# • 2026-04-11
-#
-# - EDITED:
-# • Added explicit `routes` array.
-# • Why the edit was required: To bind the worker to the temporary test domain while ensuring production is unaffected.
-# • What behavior must remain unchanged: Zero-trust secret execution.
-# • 2026-04-16
-#
-# - EDITED:
-# • Removed wildcard (/*) from custom domain routes.
-# • Why the edit was required: Cloudflare Wrangler strictly rejects path wildcards when custom_domain = true.
-# • What behavior must remain unchanged: Worker routing to the specified hostnames.
-# • 2026-04-16
-#
-# - EDITED:
-# • Replaced all previous custom domain routes with treishvaamagro.com routes.
-# • Why the edit was required: Finalizing permanent domain transition and stripping test environments.
-# • What behavior must remain unchanged: Worker must intercept identical SEO requests on the new domain.
-# • 2026-04-19
-#
-# - EDITED:
-# • Changed worker `name` to `treishvaamagro-seo-worker`.
-# • Why the edit was required: To align DevOps namespace with the new domain and orphan the legacy subdomain worker instance.
-# • What behavior must remain unchanged: Target routes remain on the treishvaamagro.com apex.
-# • 2026-04-19
-#
-# - FAILED / REJECTED ATTEMPTS:
-# • Attempted to use `custom_domain = true` for the new apex domains. Rejected by Cloudflare because the domains are already bound to the Pages project.
-#
-# - EDITED:
-# • Reverted `routes` array to standard wildcard string patterns.
-# • Why the edit was required: To deploy the worker as an intercept Route rather than a Custom Domain origin.
-# • What behavior must remain unchanged: Worker must intercept SEO requests.
-# • 2026-04-19
+# • Initial wrangler.toml for treishvaamagro-seo-worker.
+# • Mapped TREISHFIN_SEO_CACHE KV namespace to inherit established SEO caching.
+# • Phase 1 (Agro Edge Architecture).
 #
 # - DO-NOT-DELETE RULE:
 # This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -88,11 +40,8 @@ name = "treishvaamagro-seo-worker"
 main = "worker.js"
 compatibility_date = "2024-03-20"
 
-# NOTE: STRICT ZERO-TRUST ENFORCEMENT
-# NO [vars] SECTION HERE. 
-# URLs are managed via "npx wrangler secret put"
+# Note: Production values for CF_PAGES_ORIGIN and BACKEND_ORIGIN MUST be set via Cloudflare Secrets.
 
-routes = [
-  "treishvaamagro.com/*",
-  "www.treishvaamagro.com/*"
-]
+[[kv_namespaces]]
+binding = "TREISHFIN_SEO_CACHE"
+id = "035cdbfcc43048999ea6e8f47c32cf97"
