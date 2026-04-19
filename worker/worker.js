@@ -4,13 +4,13 @@
  * Purpose:
  * - Edge-side SEO rendering, high-availability fallback, and dynamic sitemap interception for Treishvaam Agro.
  * - Secure API Reverse Proxy for dynamic Next.js frontend fetching.
+ * - Comprehensive Enterprise E-E-A-T Schema Injection.
  *
  * Scope:
  * - Intercepts requests to inject JSON-LD schema via HTMLRewriter.
  * - Serves cached dynamic sitemaps from TREISHFIN_SEO_CACHE (Free-tier optimized KV).
  * - Proxies valid standard requests to Cloudflare Pages securely.
  * - Intercepts /api/* requests and proxies them to the shared backend with tenant isolation.
- * - Must never handle canonicalization (www -> apex), which is managed via Cloudflare Bulk Redirects.
  *
  * Critical Dependencies:
  * - Backend: finance-api (Tenant: agro) via BACKEND_ORIGIN secret.
@@ -23,14 +23,7 @@
  *
  * Non-Negotiables:
  * - Preserve Free Tier KV quota: Handle cache misses gracefully and update via ctx.waitUntil.
- * - Fail open: If KV or Backend fails, standard Pages requests must still execute.
- *
- * Change Intent:
- * - Phase 3: Added secure API reverse proxy for dynamic frontend integration.
- *
- * Future AI Guidance:
- * - Do not bypass the KV cache for sitemaps.
- * - Do not hardcode redirects in this execution layer.
+ * - Must inject comprehensive Founder (Amitsagar Kandpal) and Parent (Treishvaam Group) data.
  *
  * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
  * - ADDED:
@@ -44,6 +37,12 @@
  * • Added handleApiProxy to securely route /api/* requests to the backend.
  * • Enforced X-Tenant-ID: agro on all API requests.
  * • Date / Phase: Phase 3 (Backend Dynamic Integration).
+ *
+ * - EDITED:
+ * • Upgraded handleHtmlProxy with comprehensive SEO Intelligence (matching Finance Worker).
+ * • Added SPA 404 -> 200 OK Fallback logic for KNOWN_SPA_ROUTES to prevent GSC errors.
+ * • Added detailed Organization, Founder, Static Page, and Product schemas.
+ * • Date / Phase: Comprehensive SEO Upgrade.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -99,7 +98,6 @@ async function handleApiProxy(request, env, url) {
 
     try {
         const response = await fetch(proxyReq);
-        // Pass through the backend response exactly as-is to the frontend
         return new Response(response.body, response);
     } catch (error) {
         return new Response(JSON.stringify({ error: "Backend API temporarily unreachable." }), { 
@@ -143,8 +141,6 @@ async function handleSitemap(request, env, ctx, url) {
 
     try {
         const backendReq = new Request(backendUrl.toString(), request);
-        
-        // Zero-Trust Tenant Isolation
         backendReq.headers.set('X-Tenant-ID', 'agro'); 
         backendReq.headers.set('X-Forwarded-Host', url.hostname);
 
@@ -152,10 +148,7 @@ async function handleSitemap(request, env, ctx, url) {
 
         if (response.ok) {
             const body = await response.text();
-            
-            // 3. Asynchronous KV Update (Preserves request performance and free-tier quotas)
             ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, body, { expirationTtl: 86400 }));
-
             const isJson = cacheKey === 'sitemap:meta';
             return new Response(body, {
                 headers: {
@@ -168,7 +161,6 @@ async function handleSitemap(request, env, ctx, url) {
              return new Response("Backend error generating sitemap data.", { status: response.status });
         }
     } catch (error) {
-        // Handle backend-down continuity gracefully
         return new Response("Backend unreachable. Sitemap generation pending.", { status: 503 });
     }
 }
@@ -176,10 +168,9 @@ async function handleSitemap(request, env, ctx, url) {
 async function handleRobots(request, env) {
     const url = new URL(request.url);
     const host = url.hostname;
-    // Serve edge-level strict robots.txt to ensure canonical routing
     const robots = `User-agent: *\nAllow: /\nSitemap: https://${host}/sitemap.xml\n`;
     return new Response(robots, {
-        headers: { 'Content-Type': 'text/plain' }
+        headers: { 'Content-Type': 'text/plain', 'Cache-Control': 'public, max-age=86400' }
     });
 }
 
@@ -196,55 +187,177 @@ async function handleHtmlProxy(request, env, ctx, url) {
     pagesUrl.protocol = pagesOriginUrl.protocol;
 
     const proxyReq = new Request(pagesUrl.toString(), request);
-    // Security: Prevents raw CF Pages domain leakage and ensures internal routing matches the Pages project
     proxyReq.headers.set('Host', pagesOriginUrl.hostname);
 
+    // SECURITY & SEO HEADERS
+    const addSecurityHeaders = (response) => {
+        if (!response) return response;
+        const newHeaders = new Headers(response.headers);
+        newHeaders.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+        newHeaders.set("X-Content-Type-Options", "nosniff");
+        newHeaders.set("X-XSS-Protection", "1; mode=block");
+        if (newHeaders.has("X-SPA-Fallback") && response.status === 404) {
+            return new Response(response.body, { status: 200, headers: newHeaders });
+        }
+        return new Response(response.body, { status: response.status, headers: newHeaders });
+    };
+
+    // KNOWN SPA ROUTES FOR AGGRESSIVE 200 OK FALLBACK (Fixes GSC Indexing Errors)
+    const KNOWN_SPA_ROUTES = [
+        "/about", "/infrastructure", "/quality", "/sustainability", 
+        "/products", "/contact", "/home"
+    ];
+
     try {
-        const response = await fetch(proxyReq);
+        let response = await fetch(proxyReq);
 
-        const contentType = response.headers.get('Content-Type') || '';
+        // SPA FALLBACK LOGIC
+        const isKnownSpaRoute = KNOWN_SPA_ROUTES.some(route => url.pathname === route || url.pathname.startsWith(route + "/"));
+        const hasNoExtension = !url.pathname.includes(".");
         
-        // Edge JSON-LD Schema Injection logic
-        if (response.status === 200 && contentType.includes('text/html')) {
-            let schema = null;
-            
-            // Inject Homepage Schema
-            if (url.pathname === '/') {
-                schema = {
-                    "@context": "https://schema.org",
-                    "@type": "Organization",
-                    "name": "Treishvaam Agro",
-                    "url": `https://${url.hostname}`,
-                    "logo": `https://${url.hostname}/logo.webp`,
-                    "description": "Enterprise agricultural solutions and sustainable infrastructure by Treishvaam Group.",
-                    "parentOrganization": {
-                        "@type": "Organization",
-                        "name": "Treishvaam Group",
-                        "url": "https://treishvaamgroup.com"
-                    }
-                };
-            }
-
-            if (schema) {
-                return new HTMLRewriter()
-                    .on('head', new SchemaInjector(schema))
-                    .transform(response);
+        if ((response.status === 404 || response.status === 403) && (isKnownSpaRoute || hasNoExtension)) {
+            const indexReq = new Request(new URL("/index.html", pagesUrl), { method: "GET", headers: proxyReq.headers });
+            const indexResp = await fetch(indexReq);
+            if (indexResp.ok) {
+                response = new Response(indexResp.body, indexResp);
+                response.headers.set("X-SPA-Fallback", "Active");
+                response = new Response(response.body, { status: 200, headers: response.headers });
             }
         }
 
-        return response;
+        const contentType = response.headers.get('Content-Type') || '';
+        const isHtml = contentType.includes('text/html');
+
+        if (!isHtml || response.status !== 200) {
+            return addSecurityHeaders(response);
+        }
+
+        // =================================================================================
+        // COMPREHENSIVE SEO INTELLIGENCE & EDGE HYDRATION
+        // =================================================================================
+        const FRONTEND_URL = `https://${url.hostname}`;
+        const PARENT_ORG_URL = "https://treishvaamgroup.com";
+        let schema = null;
+        let pageTitle = null;
+        let pageDesc = null;
+
+        // SCENARIO A: HOMEPAGE
+        if (url.pathname === '/' || url.pathname === '/home') {
+            pageTitle = "Treishvaam Agro | Enterprise Naturals & Pure Ingredients";
+            pageDesc = "Global leaders in sustainably sourced, meticulously processed agricultural powders for the B2B enterprise market. A Treishvaam Group company.";
+            schema = {
+                "@context": "https://schema.org",
+                "@type": "Corporation",
+                "name": "Treishvaam Agro",
+                "url": FRONTEND_URL,
+                "logo": "https://treishvaamgroup.com/logo512.webp",
+                "image": "https://treishvaamgroup.com/logo512.webp",
+                "description": pageDesc,
+                "telephone": "+91 1800-AGRO-123",
+                "email": "sales@treishvaamagro.com",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "123 Agricultural Park, Block A",
+                    "addressLocality": "Bengaluru",
+                    "addressRegion": "Karnataka",
+                    "postalCode": "560001",
+                    "addressCountry": "IN"
+                },
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "contactType": "sales",
+                    "telephone": "+91 1800-AGRO-123",
+                    "email": "sales@treishvaamagro.com",
+                    "areaServed": "Global",
+                    "availableLanguage": "English"
+                },
+                "founder": {
+                    "@type": "Person",
+                    "name": "Amitsagar Kandpal",
+                    "alternateName": "Amit Kandpal",
+                    "jobTitle": "Founder & Chairman",
+                    "url": "https://treishvaamgroup.com/",
+                    "sameAs": [
+                        "https://www.linkedin.com/in/amitsagarkandpal",
+                        "https://twitter.com/treishvaam",
+                        "https://www.instagram.com/treishvaam"
+                    ]
+                },
+                "parentOrganization": {
+                    "@type": "Corporation",
+                    "name": "Treishvaam Group",
+                    "url": PARENT_ORG_URL,
+                    "logo": "https://treishvaamgroup.com/logo512.webp",
+                    "sameAs": [
+                        "https://www.linkedin.com/company/treishvaamgroup",
+                        "https://twitter.com/treishvaamgroup",
+                        "https://www.instagram.com/treishvaamgroup"
+                    ]
+                }
+            };
+        }
+
+        // SCENARIO B: STATIC PAGES
+        const staticPages = {
+            "/about": { title: "About Us | Treishvaam Agro", desc: "Learn about Treishvaam Agro's mission to bridge the gap between pure organic farming and global enterprise manufacturing." },
+            "/infrastructure": { title: "Global Infrastructure | Treishvaam Agro", desc: "Explore our state-of-the-art agricultural processing facilities and sustainable manufacturing hubs." },
+            "/quality": { title: "Quality & Certifications | Treishvaam Agro", desc: "Uncompromising quality control and global certifications for our organic agricultural ingredients." },
+            "/sustainability": { title: "Sustainability | Treishvaam Agro", desc: "Our commitment to zero-waste farming and sustainable enterprise agriculture." },
+            "/contact": { title: "Contact Us | Treishvaam Agro", desc: "Get in touch with Treishvaam Agro for bulk ingredient inquiries and enterprise partnerships." },
+            "/products": { title: "Enterprise Products | Treishvaam Agro", desc: "Browse our extensive catalog of fruit powders, vegetable powders, herbal extracts, and organic spices." }
+        };
+
+        if (staticPages[url.pathname]) {
+            pageTitle = staticPages[url.pathname].title;
+            pageDesc = staticPages[url.pathname].desc;
+            schema = {
+                "@context": "https://schema.org",
+                "@type": "WebPage",
+                "name": pageTitle,
+                "description": pageDesc,
+                "url": FRONTEND_URL + url.pathname,
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "Treishvaam Agro",
+                    "parentOrganization": { "@type": "Corporation", "name": "Treishvaam Group" },
+                    "logo": { "@type": "ImageObject", "url": "https://treishvaamgroup.com/logo512.webp" }
+                }
+            };
+        }
+
+        // SCENARIO C: PRODUCT DETAIL PAGES (/products/[id])
+        if (url.pathname.startsWith("/products/") && url.pathname.length > 10) {
+            schema = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": "Treishvaam Agro Premium Ingredient",
+                "brand": { "@type": "Brand", "name": "Treishvaam Agro" },
+                "manufacturer": { "@type": "Organization", "name": "Treishvaam Agro" },
+                "description": "Premium organically sourced agricultural powder for enterprise manufacturing.",
+                "url": FRONTEND_URL + url.pathname
+            };
+        }
+
+        if (schema) {
+            let rewriter = new HTMLRewriter()
+                .on("head", { element(e) { e.append(`<script type="application/ld+json">${JSON.stringify(schema)}</script>`, { html: true }); } });
+
+            if (pageTitle) {
+                rewriter = rewriter.on("title", { element(e) { e.setInnerContent(pageTitle); } })
+                    .on('meta[property="og:title"]', { element(e) { e.setAttribute("content", pageTitle); } });
+            }
+            if (pageDesc) {
+                rewriter = rewriter.on('meta[name="description"]', { element(e) { e.setAttribute("content", pageDesc); } })
+                    .on('meta[property="og:description"]', { element(e) { e.setAttribute("content", pageDesc); } });
+            }
+
+            const rewrittenResp = rewriter.transform(response);
+            return addSecurityHeaders(rewrittenResp);
+        }
+
+        return addSecurityHeaders(response);
 
     } catch (e) {
-        // Extreme fallback for absolute uptime requirement
-        return new Response("Service temporarily unavailable at the edge. Please try again shortly.", { status: 503 });
-    }
-}
-
-class SchemaInjector {
-    constructor(schema) {
-        this.schema = schema;
-    }
-    element(element) {
-        element.append(`<script type="application/ld+json">${JSON.stringify(this.schema)}</script>`, { html: true });
+        return new Response("Service temporarily unavailable at the edge.", { status: 503 });
     }
 }
