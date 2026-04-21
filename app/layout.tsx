@@ -8,6 +8,7 @@
  * Scope:
  * - Defines the global metadata and canonical `metadataBase`.
  * - Enforces the canonical production domain (treishvaamagro.com).
+ * - Global injection of JSON-LD Knowledge Graph.
  *
  * Critical Dependencies:
  * - SEO Worker: Relies on the edge worker to handle dynamic sitemap and robots.txt.
@@ -26,6 +27,9 @@
  * • Added metadataBase for canonical URL enforcement.
  * • Replaced legacy tagro.treishvaamgroup.com URLs with treishvaamagro.com.
  * • Date / Phase: Phase 2 (Frontend Metadata & Schema).
+ * - EDITED (Current Phase):
+ * • Injected centralized `application/ld+json` Knowledge Graph directly into layout `<head>`.
+ * • Added `alternateName` strings to map Amitsagar Kandpal and Treishvaam Agro for typo tolerance.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -80,8 +84,36 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Corporation",
+    "name": "Treishvaam Agro",
+    "alternateName": ["Treishvam Agro", "Treshvam Agro", "Treishvaam Agriculture"],
+    "url": "https://treishvaamagro.com",
+    "logo": "https://treishvaamgroup.com/logo512.webp",
+    "founder": {
+      "@type": "Person",
+      "name": "Amitsagar Kandpal",
+      "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar"],
+      "jobTitle": "Founder & Chairman",
+      "url": "https://treishvaamgroup.com/"
+    },
+    "parentOrganization": {
+      "@type": "Corporation",
+      "name": "Treishvaam Group",
+      "alternateName": ["Treishvam Group", "Treshvam Group"],
+      "url": "https://treishvaamgroup.com"
+    }
+  };
+
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${inter.className} flex flex-col min-h-screen bg-white`}>
         <Navbar />
         <main className="flex-grow w-full">

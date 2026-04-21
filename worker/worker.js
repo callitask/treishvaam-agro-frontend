@@ -43,6 +43,9 @@
  * • Added SPA 404 -> 200 OK Fallback logic for KNOWN_SPA_ROUTES to prevent GSC errors.
  * • Added detailed Organization, Founder, Static Page, and Product schemas.
  * • Date / Phase: Comprehensive SEO Upgrade.
+ * * - EDITED (Current Phase):
+ * • Added `alternateName` arrays to Founder and Organization in Scenario A schema injection.
+ * • Why: To ensure AI crawler entity mapping resolves typos seamlessly at the edge layer.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -249,6 +252,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "@context": "https://schema.org",
                 "@type": "Corporation",
                 "name": "Treishvaam Agro",
+                "alternateName": ["Treishvam Agro", "Treshvam Agro", "Treishvaam Agriculture"],
                 "url": FRONTEND_URL,
                 "logo": "https://treishvaamgroup.com/logo512.webp",
                 "image": "https://treishvaamgroup.com/logo512.webp",
@@ -274,7 +278,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "founder": {
                     "@type": "Person",
                     "name": "Amitsagar Kandpal",
-                    "alternateName": "Amit Kandpal",
+                    "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar"],
                     "jobTitle": "Founder & Chairman",
                     "url": "https://treishvaamgroup.com/",
                     "sameAs": [
@@ -286,6 +290,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "parentOrganization": {
                     "@type": "Corporation",
                     "name": "Treishvaam Group",
+                    "alternateName": ["Treishvam Group", "Treshvam Group"],
                     "url": PARENT_ORG_URL,
                     "logo": "https://treishvaamgroup.com/logo512.webp",
                     "sameAs": [
