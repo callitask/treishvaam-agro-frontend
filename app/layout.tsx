@@ -29,7 +29,8 @@
  * • Date / Phase: Phase 2 (Frontend Metadata & Schema).
  * - EDITED (Current Phase):
  * • Injected centralized `application/ld+json` Knowledge Graph directly into layout `<head>`.
- * • Added `alternateName` strings to map Amitsagar Kandpal and Treishvaam Agro for typo tolerance.
+ * • Added `alternateName` strings mapping "Trishvam" and "Treishvaam" to both Amitsagar Kandpal and Treishvaam Agro.
+ * • Why: Semantic fusion so user searches for the name alone direct to the founder and companies.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -88,20 +89,20 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Corporation",
     "name": "Treishvaam Agro",
-    "alternateName": ["Treishvam Agro", "Treshvam Agro", "Treishvaam Agriculture"],
+    "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam Agriculture", "Treishvaam", "Treishvam", "Trishvam"],
     "url": "https://treishvaamagro.com",
     "logo": "https://treishvaamgroup.com/logo512.webp",
     "founder": {
       "@type": "Person",
       "name": "Amitsagar Kandpal",
-      "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar"],
+      "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar", "Treishvaam", "Treishvam", "Trishvam"],
       "jobTitle": "Founder & Chairman",
       "url": "https://treishvaamgroup.com/"
     },
     "parentOrganization": {
       "@type": "Corporation",
       "name": "Treishvaam Group",
-      "alternateName": ["Treishvam Group", "Treshvam Group"],
+      "alternateName": ["Treishvam Group", "Treshvam Group", "Trishvam Group"],
       "url": "https://treishvaamgroup.com"
     }
   };
