@@ -9,7 +9,7 @@
  *
  * Critical Dependencies:
  * - Cloudflare Pages (Hosting).
- * - Cloudflare Worker (`treishvaamagro-seo-worker`) for SEO, Sitemaps, and API Proxying.
+ * - Cloudflare Worker (`treishvaamagro-seo-worker`) for SEO, Cache-Shielding, Sitemaps, SPA Fallbacks, and API Proxying.
  * - Shared Java Spring Boot Backend (`finance-api`).
  *
  * Security Constraints:
@@ -21,6 +21,8 @@
  * • Phase 3 Update: Overhauled project structure to reflect the removal of conflicting static assets (robots/sitemap) and legacy pages.
  * • Updated High Priority action items to focus on Backend Dynamic Integration (Zero-Trust API Client) and UI Hydration.
  * • Struck through completed SEO/Edge tasks following Phase 1-3 deployment.
+ * - EDITED (LATEST):
+ * • Updated structure to reflect Apex domain alignment and Semantic Graph objectives.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -37,13 +39,13 @@ A Next.js enterprise portal for Treishvaam Agro, an agricultural export company.
 - Landing page with enterprise messaging, product showcases, and sustainability metrics.
 - Product catalog with dynamic data hydration.
 - Informational enterprise pages (Contact, Infrastructure, Quality, Sustainability).
-- **Edge-Driven SEO**: Sitemaps, Robots.txt, and E-E-A-T Schema are injected by a Cloudflare Worker, not the React application.
+- **Edge-Driven SEO**: Sitemaps, Robots.txt, and Semantic E-E-A-T Schemas (with typo-tolerance) are injected by a Cloudflare Worker, not the React application.
 
 ## Current Project Structure (App Router + Edge)
 ```text
 treishvaam-agro-frontend/
 ├── app/
-│   ├── page.tsx (Landing page with WebPage Schema)
+│   ├── page.tsx (Landing page)
 │   ├── layout.tsx (Root layout with canonical metadataBase)
 │   ├── globals.css (Global styles)
 │   ├── products/
@@ -61,7 +63,7 @@ treishvaam-agro-frontend/
 │   ├── api-client.ts (Zero-Trust Relative API Fetcher)
 │   └── data/ (Fallback static data)
 ├── worker/
-│   ├── worker.js (The Zero-Trust Ingress, SEO Cache, & API Proxy)
+│   ├── worker.js (The Zero-Trust Ingress, Cache Shield, SPA Fallback, & API Proxy)
 │   └── wrangler.toml
 └── docs/
     └── ENTERPRISE_SEO_AND_ARCHITECTURE_MASTER_LEDGER.md
@@ -73,18 +75,19 @@ treishvaam-agro-frontend/
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **Components**: Shadcn UI, Lucide React
-- **Edge / Infrastructure**: Cloudflare Pages + Cloudflare Workers (HTMLRewriter, KV Storage)
+- **Edge / Infrastructure**: Cloudflare Pages + Cloudflare Workers (HTMLRewriter, KV Storage, SPA Fallbacks)
 
 ---
 
 ## Action Items & Priorities
 
 ### ✅ COMPLETED (Phases 1-3)
-- ~~Deploy `treishvaamagro-seo-worker` to handle all routing and Edge-side JSON-LD injection.~~
-- ~~Implement Cloudflare KV read-through caching for XML Sitemaps.~~
-- ~~Configure Next.js `layout.tsx` with canonical `metadataBase` to prevent `.pages.dev` indexing leaks.~~
+- ~~Deploy `treishvaamagro-seo-worker` to handle all routing and Edge-side JSON-LD semantic injection.~~
+- ~~Implement Cloudflare KV Cache-Shielding for XML Sitemaps.~~
+- ~~Configure Next.js `layout.tsx` with canonical `metadataBase` mapping to the Apex domain (`treishvaamagro.com`).~~
 - ~~Create `lib/api-client.ts` to force all data fetching through relative paths (`/api/v1`), allowing Worker interception.~~
 - ~~Integrate Java Spring Boot backend to recognize the `agro` tenant header.~~
+- ~~Execute Aggressive SPA Fallbacks in the Edge Worker to clear GSC 404 indexing errors.~~
 
 ### 🔴 High Priority (Phase 4: UI Polish & Hydration)
 1. **Dynamic Data Hydration**: Update `app/products/page.tsx` and `app/products/[id]/page.tsx` to consume data using `fetchAgroData` from the shared backend, replacing static mocks in `lib/data/products.ts`.
@@ -93,12 +96,12 @@ treishvaam-agro-frontend/
 
 ### 🟡 Medium Priority (UX & Performance)
 4. **Image Optimization**: Audit all components to ensure `next/image` is used with appropriate `sizes` attributes for WebP delivery.
-5. **Brand Consistency**: Review the Tailwind configuration to ensure the exact corporate color palette (Treishvaam Green/Earth tones) is applied uniformly across all Shadcn components.
+5. **Brand Consistency**: Review the Tailwind configuration to ensure the exact corporate color palette (Landify Green/Earth tones) is applied uniformly across all Shadcn components.
 6. **Error Boundaries**: Implement robust Next.js `error.tsx` boundaries to gracefully handle scenarios where the backend API proxy returns a `503 Service Unavailable`.
 
 ### 🟢 Low Priority
 7. **Accessibility (a11y)**: Audit contrast ratios, ARIA labels, and keyboard navigation flows.
-8. **Analytics**: Safely integrate GA4 or tracking pixels without violating the strict Content Security Policy (CSP) headers injected by the backend.
+8. **Knowledge Graph Scaling**: Prepare infrastructure for the eventual creation of independent Wikidata items for specific products/services, mapping them back to the Agro subsidiary item.
 
 ---
 
