@@ -43,12 +43,18 @@
  * • Added SPA 404 -> 200 OK Fallback logic for KNOWN_SPA_ROUTES to prevent GSC errors.
  * • Added detailed Organization, Founder, Static Page, and Product schemas.
  * • Date / Phase: Comprehensive SEO Upgrade.
- * - EDITED:
+ * * - EDITED:
  * • Added phonetic variants ("Trishvam", "Treishvaam") into Founder and Org alternateName arrays.
  * • Why: Semantic entity fusion so AI bots map the company identity seamlessly to the founder identity.
- * - EDITED (Current Phase):
+ * * - EDITED:
  * • Upgraded `handleSitemap` to implement "Cache-Shielding" via the `caches.default` API.
  * • Why: Eliminates up to 95% of direct KV reads during crawler spikes, unconditionally protecting the Cloudflare Free Tier quotas.
+ *
+ * - EDITED (Current Phase):
+ * • Full rewrite of `handleSitemap` to dynamically build the `<sitemapindex>` at the Edge by querying `/api/public/sitemap/meta`.
+ * • Added path rewriting for `/sitemap-dynamic/*` -> `/api/public/sitemap/*`.
+ * • Added singular `/robot.txt` fallback to resolve Next.js SPA 404 errors.
+ * • Why: Resolves Google Search Console "500 General HTTP error" caused by backend path mismatches.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -66,8 +72,8 @@ export default {
             return await handleSitemap(request, env, ctx, url);
         }
 
-        // SEO Routing: Robots.txt
-        if (path === '/robots.txt') {
+        // SEO Routing: Robots.txt (Handling singular typo fallback)
+        if (path === '/robots.txt' || path === '/robot.txt') {
             return await handleRobots(request, env);
         }
 
@@ -152,37 +158,72 @@ async function handleSitemap(request, env, ctx, url) {
         return new Response("Backend origin not configured in environment.", { status: 500 });
     }
 
-    const backendUrl = new URL(request.url);
-    const backendOriginUrl = new URL(backendOrigin);
-    backendUrl.hostname = backendOriginUrl.hostname;
-    backendUrl.protocol = backendOriginUrl.protocol;
-    backendUrl.port = backendOriginUrl.port || '';
-
+    const backendUrl = new URL(backendOrigin);
+    
     try {
-        const backendReq = new Request(backendUrl.toString(), request);
-        backendReq.headers.set('X-Tenant-ID', 'agro'); 
-        backendReq.headers.set('X-Forwarded-Host', url.hostname);
+        if (url.pathname === '/sitemap.xml') {
+            // Fetch Meta to build index dynamically
+            const metaUrl = new URL('/api/public/sitemap/meta', backendUrl);
+            const backendReq = new Request(metaUrl.toString(), request);
+            backendReq.headers.set('X-Tenant-ID', 'agro'); 
+            backendReq.headers.set('X-Forwarded-Host', url.hostname);
 
-        const response = await fetch(backendReq);
-
-        if (response.ok) {
-            const body = await response.text();
-            ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, body, { expirationTtl: 86400 }));
+            const response = await fetch(backendReq);
+            if (!response.ok) throw new Error("Backend error fetching sitemap meta.");
             
-            const isJson = cacheKey === 'sitemap:meta';
-            const freshResponse = new Response(body, {
+            const metaJson = await response.json();
+            let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+            const FRONTEND_URL = `https://${url.hostname}`;
+            
+            for (const key in metaJson) {
+                if (Array.isArray(metaJson[key])) {
+                    metaJson[key].forEach(segment => {
+                        xml += `  <sitemap>\n    <loc>${FRONTEND_URL}${segment}</loc>\n  </sitemap>\n`;
+                    });
+                }
+            }
+            xml += '</sitemapindex>';
+
+            ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, xml, { expirationTtl: 86400 }));
+            
+            const freshResponse = new Response(xml, {
                 headers: {
-                    'Content-Type': isJson ? 'application/json' : 'application/xml',
+                    'Content-Type': 'application/xml',
                     'Cache-Control': 'public, s-maxage=86400, max-age=3600',
                     'X-Cache-Status': 'MISS-KV-FETCHED'
                 }
             });
-            
             ctx.waitUntil(cache.put(cacheRequest, freshResponse.clone()));
             return freshResponse;
-            
-        } else {
-             return new Response("Backend error generating sitemap data.", { status: response.status });
+
+        } else if (url.pathname.startsWith('/sitemap-dynamic/')) {
+            // Rewrite segment fetch to backend API path
+            const backendPath = url.pathname.replace('/sitemap-dynamic/', '/api/public/sitemap/');
+            const segmentUrl = new URL(backendPath, backendUrl);
+            const backendReq = new Request(segmentUrl.toString(), request);
+            backendReq.headers.set('X-Tenant-ID', 'agro'); 
+            backendReq.headers.set('X-Forwarded-Host', url.hostname);
+
+            const response = await fetch(backendReq);
+
+            if (response.ok) {
+                const body = await response.text();
+                ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, body, { expirationTtl: 86400 }));
+                
+                const freshResponse = new Response(body, {
+                    headers: {
+                        'Content-Type': 'application/xml',
+                        'Cache-Control': 'public, s-maxage=86400, max-age=3600',
+                        'X-Cache-Status': 'MISS-KV-FETCHED'
+                    }
+                });
+                
+                ctx.waitUntil(cache.put(cacheRequest, freshResponse.clone()));
+                return freshResponse;
+                
+            } else {
+                 return new Response("Backend error generating sitemap data.", { status: response.status });
+            }
         }
     } catch (error) {
         return new Response("Backend unreachable. Sitemap generation pending.", { status: 503 });
