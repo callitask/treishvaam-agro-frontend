@@ -50,11 +50,15 @@
  * • Upgraded `handleSitemap` to implement "Cache-Shielding" via the `caches.default` API.
  * • Why: Eliminates up to 95% of direct KV reads during crawler spikes, unconditionally protecting the Cloudflare Free Tier quotas.
  *
- * - EDITED (Current Phase):
+ * - EDITED:
  * • Full rewrite of `handleSitemap` to dynamically build the `<sitemapindex>` at the Edge by querying `/api/public/sitemap/meta`.
  * • Added path rewriting for `/sitemap-dynamic/*` -> `/api/public/sitemap/*`.
  * • Added singular `/robot.txt` fallback to resolve Next.js SPA 404 errors.
  * • Why: Resolves Google Search Console "500 General HTTP error" caused by backend path mismatches.
+ *
+ * - EDITED (Current Phase):
+ * • Prepended "agro:" to all TREISHFIN_SEO_CACHE sitemap keys (`sitemap:agro:...`).
+ * • Why: To enforce zero-trust cache isolation and prevent the Finance cron job from poisoning the Agro sitemap cache.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -131,13 +135,13 @@ async function handleSitemap(request, env, ctx, url) {
         return response;
     }
 
-    const cacheKey = `sitemap:${url.pathname}`;
+    const cacheKey = `sitemap:agro:${url.pathname}`;
 
     // Tier 2: Check KV Store (Cost: 1 KV Read)
     try {
         const cached = await env.TREISHFIN_SEO_CACHE.get(cacheKey);
         if (cached) {
-            const isJson = cacheKey === 'sitemap:meta';
+            const isJson = cacheKey === 'sitemap:agro:meta';
             const kvResponse = new Response(cached, {
                 headers: {
                     'Content-Type': isJson ? 'application/json' : 'application/xml',
