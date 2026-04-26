@@ -56,9 +56,12 @@
  * • Added singular `/robot.txt` fallback to resolve Next.js SPA 404 errors.
  * • Why: Resolves Google Search Console "500 General HTTP error" caused by backend path mismatches.
  *
- * - EDITED (Current Phase):
+ * - EDITED:
  * • Prepended "agro:" to all TREISHFIN_SEO_CACHE sitemap keys (`sitemap:agro:...`).
  * • Why: To enforce zero-trust cache isolation and prevent the Finance cron job from poisoning the Agro sitemap cache.
+ * - EDITED (Current Phase):
+ * • Injected explicit `WebSite` and `ItemList` (SiteNavigationElement) schemas at the Edge.
+ * • Why: To provide structural hints to search engines for automatic Sitelinks generation below the main search result, following enterprise w3c practices.
  *
  * - DO-NOT-DELETE RULE:
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
@@ -309,6 +312,8 @@ async function handleHtmlProxy(request, env, ctx, url) {
         let schema = null;
         let pageTitle = null;
         let pageDesc = null;
+        let websiteSchema = null;
+        let sitelinksSchema = null;
 
         // SCENARIO A: HOMEPAGE
         if (url.pathname === '/' || url.pathname === '/home') {
@@ -366,6 +371,34 @@ async function handleHtmlProxy(request, env, ctx, url) {
                     ]
                 }
             };
+            
+            websiteSchema = {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Treishvaam Agro",
+                "url": FRONTEND_URL + "/",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": `${FRONTEND_URL}/search?q={search_term_string}`
+                    },
+                    "query-input": "required name=search_term_string"
+                }
+            };
+    
+            sitelinksSchema = {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "itemListElement": [
+                    { "@type": "SiteNavigationElement", "position": 1, "name": "Products", "url": `${FRONTEND_URL}/products` },
+                    { "@type": "SiteNavigationElement", "position": 2, "name": "Infrastructure", "url": `${FRONTEND_URL}/infrastructure` },
+                    { "@type": "SiteNavigationElement", "position": 3, "name": "Quality", "url": `${FRONTEND_URL}/quality` },
+                    { "@type": "SiteNavigationElement", "position": 4, "name": "Sustainability", "url": `${FRONTEND_URL}/sustainability` },
+                    { "@type": "SiteNavigationElement", "position": 5, "name": "About Us", "url": `${FRONTEND_URL}/about` },
+                    { "@type": "SiteNavigationElement", "position": 6, "name": "Contact", "url": `${FRONTEND_URL}/contact` }
+                ]
+            };
         }
 
         // SCENARIO B: STATIC PAGES
@@ -411,7 +444,16 @@ async function handleHtmlProxy(request, env, ctx, url) {
 
         if (schema) {
             let rewriter = new HTMLRewriter()
-                .on("head", { element(e) { e.append(`<script type="application/ld+json">${JSON.stringify(schema)}</script>`, { html: true }); } });
+                .on("head", { element(e) { 
+                    e.append(`<script type="application/ld+json">${JSON.stringify(schema)}</script>`, { html: true }); 
+                    
+                    if (websiteSchema) {
+                        e.append(`<script type="application/ld+json">${JSON.stringify(websiteSchema)}</script>`, { html: true }); 
+                    }
+                    if (sitelinksSchema) {
+                        e.append(`<script type="application/ld+json">${JSON.stringify(sitelinksSchema)}</script>`, { html: true }); 
+                    }
+                } });
 
             if (pageTitle) {
                 rewriter = rewriter.on("title", { element(e) { e.setInnerContent(pageTitle); } })
@@ -431,4 +473,5 @@ async function handleHtmlProxy(request, env, ctx, url) {
     } catch (e) {
         return new Response("Service temporarily unavailable at the edge.", { status: 503 });
     }
+}
 }
