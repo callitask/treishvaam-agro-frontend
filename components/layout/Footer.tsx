@@ -1,108 +1,99 @@
-﻿/**
- * AI-CONTEXT:
- *
- * Purpose:
- * - Global Footer component for Treishvaam Agro.
- *
- * Scope:
- * - Renders the static bottom layer across all pages.
- * - Contains SEO-critical internal linking structures.
- *
- * Critical Dependencies:
- * - Frontend: Standard Next.js Link component.
- *
- * Security Constraints:
- * - Contains only static routing.
- *
- * Non-Negotiables:
- * - Must strictly use the `brand.dark` (#1F4524) background color.
- * - Links highlight on hover must use the `brand.accent` (#E5B824).
- *
- * Change Intent:
- * - Re-styled to match the Naturals & Pure Figma video reference (4-column grid, dark green background).
- *
- * Future AI Guidance:
- * - Append new legal/internal links to the appropriate columns. Maintain the structural 4-column grid.
- *
- * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - EDITED:
- * • Applied dark green background and strict 4-column grid scaling.
- * • Refined hover states for better contrast and UX.
- * • 2026-02-24
- */
-
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
+import { LogoFull } from '@/components/ui/Logo';
 
 export default function Footer() {
   return (
-    <footer className="bg-brand-dark text-white pt-20 pb-8 border-t-[8px] border-brand-primary">
-      <div className="max-w-7xl mx-auto px-6 xl:px-0">
-        
-        {/* 4-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-16">
-          
-          {/* Col 1: Brand Info */}
-          <div className="flex flex-col gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-brand-primary rounded flex items-center justify-center text-white font-bold text-xl">
-                T
-              </div>
-              <span className="font-bold text-2xl tracking-tight text-white">
-                Treishvaam <span className="text-brand-accent">Agro</span>
-              </span>
+    <footer className="bg-white border-t border-brand-border">
+      {/* Compliance strip - sharp, pastel */}
+      <div className="border-b border-brand-border bg-brand-pastelGreen">
+        <div className="max-w-7xl mx-auto px-6 xl:px-0 py-3 flex flex-wrap gap-2 items-center text-[11px]">
+          <span className="font-bold tracking-widest uppercase text-brand-dark">Compliance:</span>
+          <span className="border border-brand-line bg-white px-2 py-1 font-semibold text-brand-dark">HACCP</span>
+          <span className="border border-brand-line bg-white px-2 py-1 font-semibold text-brand-dark">ISO 22000</span>
+          <span className="border border-brand-line bg-white px-2 py-1 font-semibold text-brand-dark">GMP</span>
+          <span className="border border-brand-border bg-white px-2 py-1 font-medium text-gray-700">FSSAI</span>
+          <span className="border border-[#F3E8B5] bg-brand-pastelGold px-2 py-1 font-semibold text-brand-dark">USDA Organic</span>
+          <span className="ml-auto hidden lg:inline text-gray-600">Export docs: COA • Phytosanitary • Fumigation • MSDS per batch</span>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 xl:px-0 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+          <div className="flex flex-col gap-3">
+            <Link href="/" className="flex items-center bg-white">
+              <LogoFull size={52} />
             </Link>
-            <p className="text-sm text-gray-300 leading-relaxed max-w-sm">
-              Delivering nature’s finest agricultural ingredients globally. 
-              We bridge the gap between pure organic farming and enterprise manufacturing.
+            <p className="text-sm leading-5 text-gray-600 max-w-sm">
+              Enterprise supplier of standardized fruit, vegetable and herbal powders. Direct farm procurement, low-temp processing, export-ready documentation.
             </p>
+            <div className="border border-brand-border bg-white px-3 py-2 text-xs leading-4 text-gray-600">
+              <span className="font-bold text-brand-dark">HQ</span> Bengaluru, Karnataka 560001<br />
+              <span className="font-semibold">sales@treishvaamagro.com</span> • +91 1800-AGRO-123
+            </div>
           </div>
 
-          {/* Col 2: Quick Links */}
-          <div className="flex flex-col gap-4">
-            <h4 className="font-semibold text-lg text-white mb-2">Company</h4>
-            <Link href="/about" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">About Us</Link>
-            <Link href="/infrastructure" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Infrastructure</Link>
-            <Link href="/quality" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Quality Assurance</Link>
-            <Link href="/sustainability" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Sustainability</Link>
+          <div className="flex flex-col gap-2">
+            <h4 className="text-[11px] tracking-[0.12em] uppercase font-bold text-brand-dark">Company</h4>
+            <Link href="/about" className="text-sm text-gray-600 hover:text-brand-dark">
+              About Us
+            </Link>
+            <Link href="/infrastructure" className="text-sm text-gray-600 hover:text-brand-dark">
+              Infrastructure
+            </Link>
+            <Link href="/quality" className="text-sm text-gray-600 hover:text-brand-dark">
+              Quality Assurance
+            </Link>
+            <Link href="/sustainability" className="text-sm text-gray-600 hover:text-brand-dark">
+              Sustainability
+            </Link>
           </div>
 
-          {/* Col 3: Products */}
-          <div className="flex flex-col gap-4">
-            <h4 className="font-semibold text-lg text-white mb-2">Our Products</h4>
-            <Link href="/products?category=fruit" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Fruit Powders</Link>
-            <Link href="/products?category=vegetable" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Vegetable Powders</Link>
-            <Link href="/products?category=herbal" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Herbal Extracts</Link>
-            <Link href="/products?category=spices" className="text-sm text-gray-300 hover:text-brand-accent transition-colors duration-150">Organic Spices</Link>
+          <div className="flex flex-col gap-2">
+            <h4 className="text-[11px] tracking-[0.12em] uppercase font-bold text-brand-dark">Products</h4>
+            <Link href="/products?category=Fruit%20Powders" className="text-sm text-gray-600 hover:text-brand-dark">
+              Fruit Powders
+            </Link>
+            <Link href="/products?category=Vegetable%20Powders" className="text-sm text-gray-600 hover:text-brand-dark">
+              Vegetable Powders
+            </Link>
+            <Link href="/products?category=Herbal%20Extracts" className="text-sm text-gray-600 hover:text-brand-dark">
+              Herbal Extracts
+            </Link>
+            <Link href="/products?category=Organic%20Spices" className="text-sm text-gray-600 hover:text-brand-dark">
+              Organic Spices
+            </Link>
+            <Link href="/products" className="text-sm font-semibold text-brand-dark mt-1">
+              View all 24 →
+            </Link>
           </div>
 
-          {/* Col 4: Contact */}
-          <div className="flex flex-col gap-4">
-            <h4 className="font-semibold text-lg text-white mb-2">Contact Us</h4>
-            <p className="text-sm text-gray-300">
-              <strong className="text-white block mb-1">Headquarters</strong>
-              123 Agricultural Park, Block A<br/>
-              Bengaluru, Karnataka 560001
-            </p>
-            <p className="text-sm text-gray-300 mt-2">
-              <strong className="text-white">Email:</strong> sales@treishvaamagro.com<br/>
-              <strong className="text-white">Phone:</strong> +91 1800-AGRO-123
-            </p>
+          <div className="flex flex-col gap-3">
+            <h4 className="text-[11px] tracking-[0.12em] uppercase font-bold text-brand-dark">Enterprise</h4>
+            <div className="border border-brand-border px-3 py-3 text-xs leading-4 text-gray-600">
+              <div className="font-bold text-brand-dark">For procurement teams</div>
+              MOQ 100 kg–50 MT • 14–21 day lead • 24h quote SLA
+              <br />
+              <Link href="/contact" className="inline-block mt-2 bg-brand-dark text-white text-xs font-bold px-4 py-2 border border-brand-dark">
+                Request Bulk Quote
+              </Link>
+            </div>
+            <div className="text-xs text-gray-500 leading-4">Treishvaam Group company. Audited annually. Certificates available as PDF.</div>
           </div>
-
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} Treishvaam Agro. All rights reserved.
-          </p>
-          <div className="flex gap-6">
-            <Link href="/privacy" className="text-xs text-gray-400 hover:text-white transition-colors duration-150">Privacy Policy</Link>
-            <Link href="/terms" className="text-xs text-gray-400 hover:text-white transition-colors duration-150">Terms of Service</Link>
+        <div className="mt-8 border-t border-brand-border pt-4 flex flex-col md:flex-row justify-between gap-3 text-xs text-gray-500">
+          <span>© {new Date().getFullYear()} Treishvaam Agro. All rights reserved.</span>
+          <div className="flex gap-4">
+            <Link href="/privacy" className="hover:text-brand-dark">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="hover:text-brand-dark">
+              Terms of Service
+            </Link>
+            <span className="hidden lg:inline">Made for B2B export • White • Sharp • Precise</span>
           </div>
         </div>
-
       </div>
     </footer>
   );

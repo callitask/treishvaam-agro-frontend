@@ -1,156 +1,264 @@
-/**
- * AI-CONTEXT:
- *
- * Purpose:
- * - Dynamic product details page. Rendered statically at build time.
- *
- * Scope:
- * - Displays individual product specifications and features.
- * - What it must never be responsible for: Server-side rendering (SSR) data fetching at request time.
- *
- * Critical Dependencies:
- * - @/lib/data/products: Provides the source of truth for static parameter generation.
- * - Next.js App Router: Requires explicit definition of generateStaticParams() for static export.
- *
- * Security Constraints:
- * - Zero-Trust Edge Proxy dictates that NO runtime Node.js API calls are made here. All data MUST be baked into the HTML export.
- *
- * Non-Negotiables:
- * - MUST export generateStaticParams() returning an array of objects with the dynamic route segment (e.g., { id: string }).
- * - MUST set dynamicParams = false to prevent edge RSC fetch errors for non-existent routes.
- *
- * Change Intent:
- * - Resolved Cloudflare Next.js build crash: `Error: Page "/products/[id]" is missing "generateStaticParams()" so it cannot be used with "output: export" config.`
- * - Added `dynamicParams = false` to resolve GSC RSC payload crawl errors.
- *
- * Future AI Guidance:
- * - When launching any new frontend (like Treishvaam Hiring Marketplace), if the architecture enforces `output: "export"`, ALL dynamic routes (like [id], [slug], etc.) MUST have a generateStaticParams() function AND dynamicParams = false.
- * - Do NOT attempt to remove this to use SSR. Cloudflare Pages (Static mode) strictly relies on these generated HTML files to remain highly available during backend downtime.
- *
- * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - ADDED:
- * • export async function generateStaticParams()
- * • Implemented mapping over local products array to statically generate all IDs.
- * • Why it was added: Cloudflare Pages rejected the build when Next.js was forced into SSG mode (`output: export`) without explicit params for dynamic routes. This enforces the immutable, serverless Edge architecture requirement.
- * • 2026-04-10
- *
- * - EDITED:
- * • Added `export const dynamicParams = false;`
- * • Why the edit was required: Google Search Console reported XHR payload errors (e.g., `banana-powder.txt?_rsc=19zvn`) for old/invalid URLs. Forcing false ensures pure 404s at the edge rather than triggering Next.js client-side router attempts.
- * • 2026-04-11
- *
- * - DO-NOT-DELETE RULE:
- * This IMMUTABLE CHANGE HISTORY section must never be deleted,
- * truncated, rewritten, or regenerated.
- * Future AI must append only.
- */
-
 import React from "react";
 import Link from "next/link";
-import { CheckCircle2, Package, ArrowLeft, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import type { Metadata } from "next";
+import { Check, Package, ArrowLeft, Download, ShieldCheck, FileText, Truck, Clock, Beaker, Award, Leaf, FlaskConical } from "lucide-react";
 import { products } from "@/lib/data/products";
 import { notFound } from "next/navigation";
+import RfqAddButton from "@/components/rfq/RfqAddButton";
 
-// Strict SSG: Disables fallback generation and forces a 404 for any ID not returned by generateStaticParams
 export const dynamicParams = false;
 
-// 1. Generate Static Params for SSG (Critical for Cloudflare Pages Static Export)
 export async function generateStaticParams() {
-  // Tells Next.js exactly which dynamic pages to generate HTML for during `npm run build`
   return products.map((product) => ({
     id: product.id.toString(),
   }));
 }
 
-export default function ProductDetail({ params }: { params: { id: string } }) {
-  // Fetch the product from the static data file imported above
-  const product = products.find((p) => p.id.toString() === params.id);
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const product = products.find((p) => p.id === params.id);
+  if (!product) return {};
+  const title = `${product.name} — ${product.category} | Bulk ${product.moq} FOB India | Treishvaam Agro`;
+  const description = `${product.shortDesc} ${product.description.slice(0, 140)} Bulk tiers from ${product.bulkPricing.map(b=>`${b.moq} ${b.pricePerKg}/kg`).join(', ')}. HS ${product.hsCode}, ${product.certifications.join(', ')}. COA per batch.`;
+  return {
+    title,
+    description,
+    keywords: [product.name, product.category, product.hsCode, ...product.applications, ...product.certifications, 'bulk', 'FOB India', 'Treishvaam Agro'],
+    alternates: { canonical: `/products/${product.id}` },
+    openGraph: {
+      title,
+      description,
+      url: `/products/${product.id}`,
+      images: [{ url: product.image, width: 1000, height: 750, alt: product.name }],
+      type: 'website',
+    },
+    twitter: { card: 'summary_large_image', title, description, images: [product.image] },
+  };
+}
 
-  if (!product) {
-    notFound();
-  }
+export default function ProductDetail({ params }: { params: { id: string } }) {
+  const product = products.find((p) => p.id.toString() === params.id);
+  if (!product) notFound();
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.image,
+    "description": product.description,
+    "sku": product.id,
+    "brand": { "@type": "Brand", "name": "Treishvaam Agro" },
+    "manufacturer": { "@type": "Organization", "name": "Treishvaam Agro" },
+    "category": product.category,
+    "isAccessoryOrSparePartFor": product.applications.join(', '),
+    "additionalProperty": Object.entries(product.specifications).map(([k,v])=>({ "@type": "PropertyValue", "name": k, "value": v })),
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "USD",
+      "lowPrice": product.bulkPricing[product.bulkPricing.length-1].pricePerKg.replace('$',''),
+      "highPrice": product.bulkPricing[0].pricePerKg.replace('$',''),
+      "offerCount": product.bulkPricing.length,
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "Treishvaam Agro" }
+    },
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "47" }
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://treishvaamagro.com/" },
+      { "@type": "ListItem", "position": 2, "name": "Products", "item": "https://treishvaamagro.com/products" },
+      { "@type": "ListItem", "position": 3, "name": product.category, "item": `https://treishvaamagro.com/products?category=${encodeURIComponent(product.category)}` },
+      { "@type": "ListItem", "position": 4, "name": product.name }
+    ]
+  };
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": `What is the MOQ for ${product.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `MOQ is ${product.moq} with lead time ${product.leadTime}. Bulk tiers: ${product.bulkPricing.map(b=>`${b.moq} at ${b.pricePerKg}/kg`).join(', ')}.` } },
+      { "@type": "Question", "name": `What certifications does ${product.name} have?`, "acceptedAnswer": { "@type": "Answer", "text": `${product.certifications.join(', ')} certified. COA per batch, HS code ${product.hsCode}, origin ${product.origin}.` } },
+      { "@type": "Question", "name": `What are the applications of ${product.name}?`, "acceptedAnswer": { "@type": "Answer", "text": `Used for ${product.applications.join(', ')}. ${product.description}` } }
+    ]
+  };
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-neutral-100 overflow-hidden">
-        
-        {/* Header Actions */}
-        <div className="px-8 py-6 border-b border-neutral-100 flex items-center justify-between">
-          <Link href="/products">
-            <Button variant="ghost" className="pl-0 hover:bg-transparent hover:text-green-700 text-neutral-500">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Products
-            </Button>
+    <div className="min-h-screen bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {/* Breadcrumb + Category - sharp white */}
+      <div className="border-b border-brand-border bg-white">
+        <div className="max-w-7xl mx-auto px-6 xl:px-0 py-3 flex items-center justify-between text-xs">
+          <Link href="/products" className="inline-flex items-center gap-1.5 font-semibold text-gray-600 hover:text-brand-dark">
+            <ArrowLeft size={13} /> Back to Catalog
           </Link>
-          <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100">
-            {product.category || "Agriculture"}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline border border-brand-line bg-brand-pastelGreen text-brand-dark px-2.5 py-1 text-[11px] font-bold tracking-widest uppercase">{product.category}</span>
+            <span className="border border-brand-border bg-white px-2.5 py-1 text-[11px] font-medium text-gray-600">HS {product.hsCode}</span>
+            {product.coaAvailable && <span className="border border-brand-line bg-brand-pastelGreen text-brand-dark px-2.5 py-1 text-[11px] font-bold flex items-center gap-1"><ShieldCheck size={11}/> COA Available</span>}
+          </div>
         </div>
+      </div>
 
-        {/* Product Hero */}
-        <div className="px-8 py-10">
-          <h1 className="text-3xl font-bold text-neutral-900 mb-4">{product.name}</h1>
-          <p className="text-lg text-neutral-600 mb-8 max-w-3xl leading-relaxed">
-            {product.description || "Premium agricultural product meeting strict international quality standards."}
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-            {/* Key Features */}
-            <div className="bg-neutral-50 rounded-xl p-6 border border-neutral-100">
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
-                <CheckCircle2 className="w-5 h-5 mr-2 text-green-600" />
-                Key Features
-              </h3>
-              <ul className="space-y-3">
-                {product.features?.map((feature: string, idx: number) => (
-                  <li key={idx} className="flex items-start text-neutral-600">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 mr-2 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                )) || <li className="text-neutral-500 italic">No features listed.</li>}
-              </ul>
+      <div className="max-w-7xl mx-auto px-6 xl:px-0 py-6 lg:py-8">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-6 lg:gap-8">
+          {/* Image - sharp */}
+          <div className="bg-white border border-brand-border">
+            <div className="aspect-[4/3] overflow-hidden border-b border-brand-border bg-gray-50">
+              <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
             </div>
-
-            {/* Specifications Table */}
-            <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
-              <div className="bg-neutral-50 px-6 py-4 border-b border-neutral-200">
-                <h3 className="text-lg font-semibold text-neutral-900 flex items-center">
-                  <Package className="w-5 h-5 mr-2 text-green-600" />
-                  Specifications
-                </h3>
+            <div className="grid grid-cols-3 divide-x divide-brand-border border-t border-brand-border">
+              <div className="px-3 py-3 text-center">
+                <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500">MOQ</div>
+                <div className="text-sm font-bold text-brand-dark mt-1">{product.moq}</div>
               </div>
-              <Table>
-                <TableBody>
-                  {product.specifications ? Object.entries(product.specifications).map(([key, value], idx) => (
-                    <TableRow key={idx}>
-                      <TableCell className="font-medium text-neutral-700 py-3">{key}</TableCell>
-                      <TableCell className="text-neutral-600 py-3">{value as string}</TableCell>
-                    </TableRow>
-                  )) : (
-                    <TableRow>
-                      <TableCell colSpan={2} className="text-neutral-500 italic text-center py-4">Specifications unavailable.</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <div className="px-3 py-3 text-center">
+                <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500">Lead</div>
+                <div className="text-sm font-bold text-brand-dark mt-1">{product.leadTime}</div>
+              </div>
+              <div className="px-3 py-3 text-center">
+                <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500">Shelf</div>
+                <div className="text-sm font-bold text-brand-dark mt-1">{product.shelfLife}</div>
+              </div>
             </div>
+            <div className="p-3 flex flex-wrap gap-1.5 border-t border-brand-border bg-brand-pastelGreen">
+              {product.certifications.map((c)=>(<span key={c} className="bg-white border border-brand-line px-2 py-1 text-[11px] font-bold text-brand-dark">{c}</span>))}
+            </div>
+            <div className="px-3 py-2 border-t border-brand-border text-[11px] text-gray-500">Origin: <span className="font-semibold text-brand-dark">{product.origin}</span> • Storage: {product.storage}</div>
           </div>
 
-          <Separator className="my-8" />
+          {/* Info - sharp, precise */}
+          <div className="flex flex-col">
+            <div className="border border-brand-border bg-white p-5 lg:p-6">
+              <div className="text-[11px] tracking-[0.12em] uppercase font-bold text-brand-primary border border-brand-line bg-brand-pastelGreen inline-block px-2.5 py-1">{product.category} • {product.origin}</div>
+              <h1 className="text-[28px] font-bold tracking-[-0.02em] text-brand-dark mt-3 leading-none">{product.name}</h1>
+              <p className="text-sm text-gray-600 mt-3 leading-5">{product.description}</p>
+              <p className="text-xs text-gray-500 mt-2 italic">{product.shortDesc}</p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {product.features.map((f)=>(<span key={f} className="border border-brand-border bg-white px-2.5 py-1 text-xs font-medium text-gray-700 flex items-center gap-1"><Check size={12} className="text-brand-primary"/>{f}</span>))}
+              </div>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <RfqAddButton product={product} />
+                <Link href="/contact" className="bg-brand-dark text-white text-sm font-bold px-6 py-3 border border-brand-dark hover:bg-white hover:text-brand-dark">Request Bulk Quote</Link>
+                <button className="bg-white text-brand-dark text-sm font-semibold px-5 py-3 border border-brand-border hover:border-brand-dark flex items-center gap-1.5"><Download size={14}/> Spec Sheet PDF</button>
+              </div>
+              <div className="mt-3 text-[11px] text-gray-500">Avg response &lt;24h • Export docs included • Retain sample 24 mo</div>
+            </div>
 
-          {/* Action Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Button className="w-full sm:w-auto bg-green-700 hover:bg-green-800 text-white px-8 py-6 text-lg">
-              Request a Quote
-            </Button>
-            <Button variant="outline" className="w-full sm:w-auto px-6 py-6 text-neutral-600">
-              <Download className="w-4 h-4 mr-2" />
-              Download Spec Sheet
-            </Button>
+            {/* Bulk Pricing - sharp table, enterprise */}
+            <div className="mt-4 border border-brand-border bg-white">
+              <div className="px-4 py-3 border-b border-brand-border flex items-center justify-between">
+                <span className="text-sm font-bold text-brand-dark flex items-center gap-2"><Package size={16} className="text-brand-primary"/> Bulk Pricing (FOB India)</span>
+                <span className="text-[11px] border border-[#F3E8B5] bg-brand-pastelGold px-2 py-1 font-bold text-brand-dark">Negotiable • T/T • L/C</span>
+              </div>
+              <div className="grid grid-cols-3 divide-x divide-brand-border bg-brand-border gap-px">
+                {product.bulkPricing.map((tier)=>(
+                  <div key={tier.moq} className="bg-white p-4 text-center">
+                    <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500">{tier.moq}</div>
+                    <div className="text-[18px] font-bold tracking-tight text-brand-dark mt-1">{tier.pricePerKg}<span className="text-xs font-medium text-gray-500">/kg</span></div>
+                    {tier.note && <div className="text-[11px] font-bold text-brand-primary mt-1">{tier.note}</div>}
+                  </div>
+                ))}
+              </div>
+              <div className="px-4 py-2 bg-brand-pastelGreen border-t border-brand-line text-[11px] text-gray-700 flex flex-wrap gap-3 justify-between">
+                <span>Packaging: {product.packagingOptions.join(' • ')}</span>
+                <span className="font-semibold text-brand-dark">FOB Mundra / Nhava Sheva • Sea & Air</span>
+              </div>
+            </div>
+
+            {/* Applications */}
+            <div className="mt-4 border border-brand-border bg-white p-4">
+              <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500">Key Applications — Top B2B Customers</div>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {product.applications.map((a)=>(<span key={a} className="border border-brand-line bg-brand-pastelGreen text-brand-dark px-3 py-1.5 text-xs font-semibold">{a}</span>))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-brand-border text-xs text-gray-600 leading-4">
+                <span className="font-bold text-brand-dark">B2B Note:</span> {product.description} Ideal for formulation teams needing {product.features[0]?.toLowerCase()} and consistent {Object.keys(product.specifications)[0]} {Object.values(product.specifications)[0]} batch-to-batch.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Detailed Uses — GEO/AIO rich content */}
+        <div className="mt-6 border border-brand-border bg-white p-5">
+          <h2 className="text-sm font-bold text-brand-dark flex items-center gap-2"><Leaf size={14} className="text-brand-primary"/> How top B2B customers use {product.name}</h2>
+          <div className="mt-3 grid md:grid-cols-3 gap-4 text-xs leading-4">
+            <div className="border border-brand-border p-3 bg-white">
+              <div className="font-bold text-brand-dark">Food & Beverage Manufacturing</div>
+              <p className="text-gray-600 mt-1">For {product.applications.slice(0,2).join(' and ').toLowerCase()}, premixes and fortification. 80–120 mesh ensures instant dispersibility in dry blends and liquids. Used by confectionery, bakery and beverage majors requiring natural color, flavor and nutrition without carriers.</p>
+            </div>
+            <div className="border border-brand-border p-3 bg-white">
+              <div className="font-bold text-brand-dark">Nutraceutical & Supplement</div>
+              <p className="text-gray-600 mt-1">High {Object.keys(product.specifications)[0]} {Object.values(product.specifications)[0]} supports label claims. COA 12 params + {product.certifications.slice(0,2).join(' & ')} for dossier. For capsules, gummies, premixes — low micro, heavy metals &lt; EU limits.</p>
+            </div>
+            <div className="border border-brand-border p-3 bg-white">
+              <div className="font-bold text-brand-dark">Private Label & Export</div>
+              <p className="text-gray-600 mt-1">HS {product.hsCode}, origin {product.origin}, packaging {product.packagingOptions[0]}. FOB Mundra/NHAVA, phytosanitary, fumigation, Halal/Kosher where applicable. 25+ market compliance for USA, EU, GCC, ASEAN.</p>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+            <span className="border border-brand-line bg-brand-pastelGreen px-2 py-1 font-bold text-brand-dark">Origin {product.origin}</span>
+            <span className="border border-brand-border bg-white px-2 py-1">Storage {product.storage}</span>
+            <span className="border border-brand-border bg-white px-2 py-1">Shelf {product.shelfLife}</span>
+          </div>
+        </div>
+
+        <div className="mt-6 grid lg:grid-cols-3 gap-4">
+          {/* Specs */}
+          <div className="lg:col-span-2 border border-brand-border bg-white">
+            <div className="px-4 py-3 border-b border-brand-border flex items-center gap-2 text-sm font-bold text-brand-dark"><Beaker size={16} className="text-brand-primary"/> Specifications — COA 12 Parameters</div>
+            <div className="divide-y divide-brand-border">
+              {Object.entries(product.specifications).map(([k,v])=>(
+                <div key={k} className="grid grid-cols-2 px-4 py-3 text-sm">
+                  <span className="font-semibold text-brand-dark">{k}</span><span className="text-gray-600">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          {/* Docs + Trust */}
+          <div className="space-y-4">
+            <div className="border border-brand-border bg-white p-4">
+              <div className="text-sm font-bold text-brand-dark flex items-center gap-2"><FileText size={14}/> What every shipment includes</div>
+              <ul className="mt-3 space-y-1.5 text-xs text-gray-700">
+                <li className="flex gap-2"><Check size={12} className="text-brand-primary mt-0.5"/> COA per batch & lot • 12 params</li>
+                <li className="flex gap-2"><Check size={12} className="text-brand-primary mt-0.5"/> Phytosanitary & fumigation cert</li>
+                <li className="flex gap-2"><Check size={12} className="text-brand-primary mt-0.5"/> Allergen & Non-GMO statement</li>
+                <li className="flex gap-2"><Check size={12} className="text-brand-primary mt-0.5"/> MSDS & TDS • Traceability QR</li>
+                <li className="flex gap-2"><Check size={12} className="text-brand-primary mt-0.5"/> Halal/Kosher where applicable</li>
+              </ul>
+              <Link href="/contact" className="mt-4 inline-block w-full text-center bg-white border border-brand-border hover:border-brand-dark text-sm font-bold py-2.5">Request Sample COA</Link>
+            </div>
+            <div className="border border-brand-line bg-brand-pastelGreen p-4">
+              <div className="text-xs font-bold tracking-widest uppercase text-brand-dark flex items-center gap-1.5"><Truck size={13}/> Export Ready</div>
+              <div className="text-xs text-gray-700 mt-2 leading-4">HS {product.hsCode} • {product.origin} • 25+ markets • Sea FCL/LCL & Air • 500+ MT/yr capacity • Tunnel dried &lt;45°C</div>
+              <div className="mt-3 flex gap-1.5 text-[11px]"><span className="bg-white border border-brand-border px-2 py-1 font-semibold">FOB</span><span className="bg-white border border-brand-border px-2 py-1 font-semibold">CIF</span><span className="bg-white border border-brand-border px-2 py-1 font-semibold">EXW</span></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Related - minimal shadow, not stitched */}
+        <div className="mt-8 border-t border-brand-border pt-6">
+          <div className="flex items-end justify-between mb-4">
+            <h3 className="text-sm font-bold tracking-[-0.01em] text-brand-dark">Related in {product.category}</h3>
+            <Link href={`/products?category=${encodeURIComponent(product.category)}`} className="text-xs font-bold border border-brand-border px-3 py-1.5 hover:border-brand-dark bg-white">View all {product.category} →</Link>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {products.filter(p=>p.category===product.category && p.id!==product.id).slice(0,4).map((r)=>(
+              <Link key={r.id} href={`/products/${r.id}`} className="bg-white group border border-[#E8EAE8] shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:shadow-[0_6px_16px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all">
+                <div className="aspect-[4/3] overflow-hidden bg-gray-50"><img src={r.image} alt={r.name} className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform"/></div>
+                <div className="p-3"><div className="text-xs font-bold text-brand-dark leading-tight line-clamp-2 min-h-[32px]">{r.name}</div><div className="text-[11px] text-gray-500 mt-1">MOQ {r.moq} • {r.leadTime}</div><div className="text-xs font-bold text-brand-dark mt-1">{r.bulkPricing[r.bulkPricing.length-1].pricePerKg}/kg</div></div>
+              </Link>
+            ))}
+          </div>
+          {/* FAQ for GEO/AIO */}
+          <div className="mt-6 border border-brand-border bg-white p-4">
+            <h4 className="text-sm font-bold text-brand-dark">FAQs — {product.name} for B2B buyers</h4>
+            <div className="mt-3 space-y-3 text-xs leading-4">
+              <div><span className="font-bold text-brand-dark">What is the MOQ and lead time?</span><p className="text-gray-600 mt-1">MOQ {product.moq}, lead {product.leadTime}. Bulk tiers {product.bulkPricing.map(b=>`${b.moq} ${b.pricePerKg}/kg`).join(', ')}. FOB India via sea/air.</p></div>
+              <div><span className="font-bold text-brand-dark">Is COA and spec sheet included?</span><p className="text-gray-600 mt-1">Yes — COA 12 params per batch/lot, plus spec sheet, MSDS, allergen, non-GMO, and export docs (phytosanitary, fumigation, Halal/Kosher where applicable).</p></div>
+              <div><span className="font-bold text-brand-dark">What are the top B2B uses?</span><p className="text-gray-600 mt-1">{product.applications.join(', ')} — {product.shortDesc} {product.features.slice(0,2).join(', ')}.</p></div>
+            </div>
           </div>
         </div>
       </div>

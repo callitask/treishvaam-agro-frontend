@@ -1,21 +1,10 @@
 export default function StatsStrip() {
-  const stats = [
-    { value: '15+', label: 'Premium Products' },
-    { value: '25+', label: 'Export Markets' },
-    { value: '500+', label: 'MT Annual Capacity' },
-    { value: '100%', label: 'Quality Assured' },
-  ];
-
   return (
-    <section className="py-16 bg-white border-t border-gray-100">
-      <div className="container-custom">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((stat, idx) => (
-            <div key={idx} className="text-center">
-              <div className="text-4xl lg:text-5xl font-bold text-naturals-green-900 mb-2">{stat.value}</div>
-              <div className="text-sm lg:text-base text-gray-500 uppercase tracking-wide font-medium">{stat.label}</div>
-            </div>
-          ))}
+    <section className="w-full bg-white border-b border-brand-border">
+      <div className="max-w-7xl mx-auto px-6 xl:px-0">
+        <div className="border-x border-b border-brand-border bg-brand-pastelGreen px-4 py-2.5 flex flex-wrap gap-4 items-center justify-between text-[11px]">
+          <span className="font-semibold tracking-widest uppercase text-brand-dark">Quality Assured • HACCP • ISO 22000 • GMP • FSSAI • USDA Organic • Halal • Kosher</span>
+          <span className="text-gray-600 hidden lg:inline">Pesticide & heavy-metal reports per batch on request</span>
         </div>
       </div>
     </section>

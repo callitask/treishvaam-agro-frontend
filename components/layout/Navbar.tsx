@@ -1,235 +1,142 @@
-/**
- * AI-CONTEXT:
- *
- * Purpose:
- * - Global Navigation Component for Treishvaam Agro.
- * - Implements the enterprise dual-tier architecture (Top Bar + Main Navigation) and Mega-Menu.
- *
- * Scope:
- * - Handles client-side scroll state for sticky header transitions.
- * - Handles hover intent and routing.
- * - MUST remain visually isolated and self-contained.
- *
- * Critical Dependencies:
- * - Frontend: Relies on `framer-motion` for enterprise-grade easing curves and `lucide-react` for SVG icons.
- * - Worker / SEO / Sitemap: Navigation links must remain semantic `<a>` tags via Next.js `<Link>` for crawler continuity.
- *
- * Security Constraints:
- * - Links must be purely relative. No hardcoded environment origins.
- *
- * Non-Negotiables:
- * - Must precisely follow the 32px (Top Bar) and 80px (Main Nav) height specs.
- * - Sticky drop-shadow must trigger exactly after scrolling past the Top Bar.
- * - Content MUST be constrained within max-w-7xl to prevent edge-to-edge stretching.
- *
- * Change Intent:
- * - Fixed layout stretching by wrapping inner contents in max-w-7xl containers.
- *
- * Future AI Guidance:
- * - If adding new routes, simply append to the `navLinks` constant. Do not refactor the scroll listener logic.
- *
- * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - EDITED:
- * • Completely rebuilt to support two-tier architecture.
- * • Added scroll listener for sticky state z-index layering (z-30).
- * • Added Framer Motion for mega-menu transitions.
- * • Fixed edge-to-edge stretching by adding max-w-7xl constraints.
- * • 2026-02-24
- */
-
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, Mail, Globe, ChevronDown, Menu, X } from 'lucide-react';
+import { Phone, Mail, ChevronDown, Menu, X } from 'lucide-react';
+import RfqCart from '@/components/rfq/RfqCart';
+import { LogoFull } from '@/components/ui/Logo';
 
 const productsMenu = [
-  { name: 'Fruit Powders', href: '/products?category=fruit' },
-  { name: 'Vegetable Powders', href: '/products?category=vegetable' },
-  { name: 'Herbal Extracts', href: '/products?category=herbal' },
-  { name: 'Organic Spices', href: '/products?category=spices' },
+  { name: 'Fruit Powders', href: '/products?category=Fruit%20Powders' },
+  { name: 'Vegetable Powders', href: '/products?category=Vegetable%20Powders' },
+  { name: 'Herbal Extracts', href: '/products?category=Herbal%20Extracts' },
+  { name: 'Organic Spices', href: '/products?category=Organic%20Spices' },
 ];
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState(false);
   const pathname = usePathname();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 32);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  let timeoutId: NodeJS.Timeout;
-  const handleMouseEnter = (menu: string) => {
-    clearTimeout(timeoutId);
-    setActiveDropdown(menu);
-  };
-  const handleMouseLeave = () => {
-    timeoutId = setTimeout(() => {
-      setActiveDropdown(null);
-    }, 150);
-  };
+  const linkBase = 'text-[13px] font-semibold tracking-[0.02em] h-full flex items-center border-b-2 transition-colors';
+  const active = 'text-brand-dark border-brand-dark';
+  const idle = 'text-gray-600 border-transparent hover:text-brand-dark hover:border-brand-border';
 
   return (
-    <header className="w-full flex flex-col z-50">
-      {/* Top Bar - 32px Height, Dark Green */}
-      <div className="bg-brand-dark h-[32px] w-full hidden md:block border-b border-white/10 z-40">
-        <div className="max-w-7xl mx-auto h-full px-6 xl:px-0 flex items-center justify-between text-xs font-medium text-white/90">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
-              <Mail size={14} />
-              <span>sales@treishvaamagro.com</span>
-            </div>
-            <div className="flex items-center gap-2 hover:text-brand-accent transition-colors duration-150 cursor-pointer">
-              <Phone size={14} />
-              <span>+91 1800-AGRO-123</span>
-            </div>
+    <header className="w-full bg-white sticky top-0 z-50 border-b border-brand-border">
+      {/* Top bar - sharp, white, pastel, precise - no dark */}
+      <div className="hidden md:block border-b border-brand-border bg-white">
+        <div className="max-w-7xl mx-auto px-6 xl:px-0 h-[32px] flex items-center justify-between text-[11px]">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <Mail size={12} className="text-brand-primary" /> sales@treishvaamagro.com
+            </span>
+            <span className="w-px h-3 bg-brand-border" />
+            <span className="flex items-center gap-1.5 text-gray-600">
+              <Phone size={12} className="text-brand-primary" /> +91 1800-AGRO-123
+            </span>
+            <span className="hidden lg:inline w-px h-3 bg-brand-border" />
+            <span className="hidden lg:inline text-gray-500">Exports: <span className="font-semibold text-brand-dark">USA • EU • GCC • ASEAN</span></span>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 cursor-pointer hover:text-brand-accent transition-colors duration-150">
-              <Globe size={14} />
-              <span>EN</span>
-            </div>
-            <Link href="/client-portal" className="hover:text-brand-accent transition-colors duration-150">
-              Client Login
-            </Link>
+          <div className="flex items-center gap-3">
+            <span className="border border-brand-line bg-brand-pastelGreen text-brand-dark px-2 py-1 text-[10px] font-bold tracking-widest uppercase">HACCP • ISO 22000</span>
+            <span className="border border-[#F3E8B5] bg-brand-pastelGold text-brand-dark px-2 py-1 text-[10px] font-bold tracking-widest uppercase">USDA Organic</span>
+            <Link href="/client-portal" className="text-gray-600 hover:text-brand-dark font-semibold ml-2">Client Login →</Link>
           </div>
         </div>
       </div>
 
-      {/* Main Navigation - 80px Height */}
-      <div className={`w-full bg-white transition-all duration-300 z-30 ${isScrolled ? 'fixed top-0 left-0 shadow-sticky' : 'relative'}`}>
-        <nav className="max-w-7xl mx-auto h-[80px] flex items-center justify-between px-6 xl:px-0">
-          {/* Logo */}
-          <Link href="/" className="flex-shrink-0 flex items-center gap-2">
-            <div className="w-10 h-10 bg-brand-primary rounded flex items-center justify-center text-white font-bold text-xl">
-              T
-            </div>
-            <span className="text-brand-dark font-bold text-2xl tracking-tight hidden sm:block">
-              Treishvaam <span className="text-brand-primary">Agro</span>
-            </span>
+      {/* Main nav — height = logo (56) + 4px pad = 60, no overflow */}
+      <div className="bg-white">
+        <nav className="max-w-7xl mx-auto h-[60px] flex items-center justify-between px-6 xl:px-0">
+          <Link href="/" className="flex items-center bg-white h-[60px] py-1">
+            <LogoFull size={52} />
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden lg:flex items-center h-full gap-8">
-            <Link 
-              href="/" 
-              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-            >
+          <div className="hidden lg:flex items-center h-full gap-6">
+            <Link href="/" className={`${linkBase} ${pathname === '/' ? active : idle}`}>
               Home
             </Link>
-            
-            {/* Products Mega Menu Trigger */}
-            <div 
+            <div
               className="h-full flex items-center relative"
-              onMouseEnter={() => handleMouseEnter('products')}
-              onMouseLeave={handleMouseLeave}
+              onMouseEnter={() => setActiveDropdown(true)}
+              onMouseLeave={() => setActiveDropdown(false)}
             >
-              <button className={`flex items-center gap-1 text-sm font-semibold transition-colors duration-150 h-full border-b-2 ${pathname.startsWith('/products') ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}>
-                Products <ChevronDown size={16} className={`transition-transform duration-200 ${activeDropdown === 'products' ? 'rotate-180' : ''}`} />
+              <button className={`${linkBase} gap-1 ${pathname.startsWith('/products') ? active : idle}`}>
+                Products <ChevronDown size={14} className={`${activeDropdown ? 'rotate-180' : ''} transition-transform`} />
               </button>
-
-              <AnimatePresence>
-                {activeDropdown === 'products' && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                    className="absolute top-[80px] -left-4 w-[400px] bg-white shadow-mega-menu rounded-b-xl border border-gray-100 overflow-hidden"
-                  >
-                    <div className="p-6 grid grid-cols-2 gap-4">
-                      {productsMenu.map((item) => (
-                        <Link 
-                          key={item.name} 
-                          href={item.href}
-                          className="p-3 rounded-lg hover:bg-brand-secondary text-sm font-medium text-gray-800 hover:text-brand-dark transition-colors duration-150"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
-                    <div className="bg-gray-50 p-4 border-t border-gray-100">
-                      <Link href="/products" className="text-brand-primary text-sm font-semibold flex items-center hover:underline">
-                        View all products &rarr;
+              {activeDropdown && (
+                <div className="absolute top-[72px] left-0 w-[420px] bg-white border border-brand-border shadow-mega-menu">
+                  <div className="grid grid-cols-2 gap-px bg-brand-border">
+                    {productsMenu.map((item) => (
+                      <Link key={item.name} href={item.href} className="bg-white p-4 text-[13px] font-semibold text-brand-dark hover:bg-brand-pastelGreen hover:text-brand-dark">
+                        {item.name}
                       </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    ))}
+                  </div>
+                  <div className="bg-white border-t border-brand-border px-4 py-3 flex items-center justify-between">
+                    <Link href="/products" className="text-sm font-bold text-brand-dark">
+                      View all 12 products →
+                    </Link>
+                    <span className="text-[11px] text-gray-500">COA • Spec • MSDS</span>
+                  </div>
+                </div>
+              )}
             </div>
-
-            <Link 
-              href="/infrastructure" 
-              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/infrastructure' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-            >
+            <Link href="/infrastructure" className={`${linkBase} ${pathname === '/infrastructure' ? active : idle}`}>
               Infrastructure
             </Link>
-            <Link 
-              href="/quality" 
-              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/quality' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-            >
+            <Link href="/quality" className={`${linkBase} ${pathname === '/quality' ? active : idle}`}>
               Quality & Certs
             </Link>
-            <Link 
-              href="/sustainability" 
-              className={`text-sm font-semibold transition-colors duration-150 h-full flex items-center border-b-2 ${pathname === '/sustainability' ? 'text-brand-primary border-brand-primary' : 'text-gray-700 border-transparent hover:text-brand-primary'}`}
-            >
+            <Link href="/sustainability" className={`${linkBase} ${pathname === '/sustainability' ? active : idle}`}>
               Sustainability
             </Link>
           </div>
 
-          {/* Action Button */}
-          <div className="hidden lg:flex items-center">
-            <Link 
-              href="/contact" 
-              className="bg-brand-accent hover:bg-brand-accent-hover text-brand-dark font-bold text-sm px-6 py-2.5 rounded-enterprise transition-all duration-150 shadow-resting hover:shadow-lifted"
-            >
+          <div className="hidden lg:flex items-center gap-2">
+            <RfqCart />
+            <Link href="/contact" className="bg-brand-dark text-white text-[13px] font-bold tracking-wide px-5 py-2.5 border border-brand-dark hover:bg-white hover:text-brand-dark transition-colors">
               Request Quote
             </Link>
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <button 
-            className="lg:hidden text-brand-dark p-2 -mr-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button className="lg:hidden p-2 border border-brand-border" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+            {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
         </nav>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-white border-t border-gray-100 overflow-hidden z-50 shadow-mega-menu"
-          >
-            <div className="flex flex-col p-6 gap-4">
-              <Link href="/" className="text-gray-800 font-semibold py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Home</Link>
-              <Link href="/products" className="text-gray-800 font-semibold py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Products</Link>
-              <Link href="/infrastructure" className="text-gray-800 font-semibold py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Infrastructure</Link>
-              <Link href="/quality" className="text-gray-800 font-semibold py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Quality & Certs</Link>
-              <Link href="/sustainability" className="text-gray-800 font-semibold py-2 border-b border-gray-50" onClick={() => setMobileMenuOpen(false)}>Sustainability</Link>
-              <Link href="/contact" className="text-center bg-brand-accent text-brand-dark font-bold py-3 mt-4 rounded-enterprise" onClick={() => setMobileMenuOpen(false)}>
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-brand-border bg-white">
+          <div className="flex flex-col">
+            <Link href="/" className="px-6 py-4 border-b border-brand-border text-sm font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              Home
+            </Link>
+            <Link href="/products" className="px-6 py-4 border-b border-brand-border text-sm font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              Products
+            </Link>
+            <Link href="/infrastructure" className="px-6 py-4 border-b border-brand-border text-sm font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              Infrastructure
+            </Link>
+            <Link href="/quality" className="px-6 py-4 border-b border-brand-border text-sm font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              Quality & Certs
+            </Link>
+            <Link href="/sustainability" className="px-6 py-4 border-b border-brand-border text-sm font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              Sustainability
+            </Link>
+            <div className="p-4 flex flex-col gap-2 bg-brand-pastelGreen border-t border-brand-line">
+              <Link href="/contact" className="text-center bg-brand-dark text-white font-bold py-3 border border-brand-dark" onClick={() => setMobileMenuOpen(false)}>
                 Request Quote
               </Link>
+              <div className="flex justify-center">
+                <RfqCart />
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

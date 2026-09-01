@@ -43,40 +43,51 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import { RfqProvider } from '@/lib/store/rfq-store';
+import ThirdPartyScripts from '@/components/ThirdPartyScripts';
+import { Toaster } from '@/components/ui/sonner';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], display: 'swap', preload: true, fallback: ['system-ui', 'sans-serif'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://treishvaamagro.com'),
   title: {
-    default: 'Treishvaam Agro | Enterprise Naturals & Pure Ingredients',
+    default: 'Treishvaam Agro | Enterprise B2B Fruit & Vegetable Powders — 24 SKUs, FOB India',
     template: '%s | Treishvaam Agro',
   },
-  description: 'Global leaders in sustainably sourced, meticulously processed agricultural powders for the B2B enterprise market. A Treishvaam Group company.',
-  keywords: ['agricultural powders', 'organic extracts', 'B2B ingredients', 'Treishvaam Agro', 'natural powders', 'Amitsagar Kandpal'],
-  authors: [{ name: 'Amitsagar Kandpal' }],
+  description: 'Enterprise B2B supplier of 24 standardized fruit, vegetable & herbal powders for food, beverage & nutraceutical manufacturing. Bulk 100kg–20MT, COA per batch, HACCP ISO 22000 USDA Organic. Export to 25+ markets. FOB Mundra/NHAVA.',
+  keywords: [
+    'fruit powder bulk', 'vegetable powder B2B', 'mango powder Alphonso', 'banana powder', 'beetroot powder', 'spinach powder', 'tomato powder', 'moringa leaf powder',
+    'herbal extract ashwagandha', 'amla powder', 'turmeric curcumin', 'black pepper powder', 'ginger powder', 'B2B ingredients India', 'bulk ingredients export',
+    'Treishvaam Agro', 'Amitsagar Kandpal', 'HACCP certified', 'ISO 22000', 'USDA Organic', 'FSSAI', 'GMP', 'COA', 'HS code'
+  ],
+  authors: [{ name: 'Amitsagar Kandpal', url: 'https://treishvaamgroup.com' }],
   creator: 'Amitsagar Kandpal',
   publisher: 'Treishvaam Group',
+  category: 'B2B Manufacturing',
+  alternates: { canonical: '/' },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
+  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
   openGraph: {
-    title: 'Treishvaam Agro | Enterprise Naturals',
-    description: 'Pure organic agricultural ingredients for global manufacturing.',
+    title: 'Treishvaam Agro | Enterprise B2B Powders — 24 SKUs',
+    description: '24 standardized fruit, veg & herbal powders for enterprise manufacturing. Bulk tiers, COA 12 params, HACCP/ISO/USDA. 25+ export markets.',
     url: '/',
     siteName: 'Treishvaam Agro',
-    images: [
-      {
-        url: 'https://treishvaamgroup.com/logo512.webp',
-        width: 512,
-        height: 512,
-        alt: 'Treishvaam Agro Logo',
-      }
-    ],
+    images: [{ url: 'https://treishvaamagro.com/Treishvaam_Agro_Logo.svg', width: 2048, height: 768, alt: 'Treishvaam Agro — Enterprise B2B Ingredients' }],
     type: 'website',
+    locale: 'en_IN',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Treishvaam Agro | Enterprise Naturals',
-    description: 'Global leaders in sustainably sourced agricultural powders.',
-    images: ['https://treishvaamgroup.com/logo512.webp'],
+    title: 'Treishvaam Agro | Enterprise B2B Powders',
+    description: '24 B2B powders — bulk FOB India, COA per batch, 25+ export markets.',
+    images: ['https://treishvaamagro.com/Treishvaam_Agro_Logo.svg'],
+    creator: '@treishvaamagro',
+  },
+  other: {
+    'geo.region': 'IN-KA',
+    'geo.placename': 'Bengaluru',
+    'industry': 'B2B Food Ingredients Manufacturing',
   },
 };
 
@@ -85,42 +96,59 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const jsonLd = {
+  const orgJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Corporation",
+    "@type": "Organization",
     "name": "Treishvaam Agro",
-    "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam Agriculture", "Treishvaam", "Treishvam", "Trishvam"],
+    "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam Agriculture"],
     "url": "https://treishvaamagro.com",
-    "logo": "https://treishvaamgroup.com/logo512.webp",
+    "logo": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+    "image": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+    "description": "Enterprise B2B supplier of 24 standardized fruit, vegetable and herbal powders for global food, beverage and nutraceutical manufacturing. FOB India, HACCP ISO 22000 USDA Organic.",
+    "foundingDate": "2015",
     "founder": {
       "@type": "Person",
       "name": "Amitsagar Kandpal",
-      "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar", "Treishvaam", "Treishvam", "Trishvam"],
+      "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal"],
       "jobTitle": "Founder & Chairman",
       "url": "https://treishvaamgroup.com/"
     },
-    "parentOrganization": {
-      "@type": "Corporation",
-      "name": "Treishvaam Group",
-      "alternateName": ["Treishvam Group", "Treshvam Group", "Trishvam Group"],
-      "url": "https://treishvaamgroup.com"
-    }
+    "parentOrganization": { "@type": "Organization", "name": "Treishvaam Group", "url": "https://treishvaamgroup.com" },
+    "address": { "@type": "PostalAddress", "addressLocality": "Bengaluru", "addressRegion": "Karnataka", "addressCountry": "IN" },
+    "contactPoint": { "@type": "ContactPoint", "email": "sales@treishvaamagro.com", "telephone": "+91-1800-AGRO-123", "contactType": "sales", "areaServed": ["US","DE","AE","SG","AU","GB","IN"], "availableLanguage": ["en"] },
+    "sameAs": ["https://treishvaamgroup.com"],
+    "knowsAbout": ["Fruit Powder Manufacturing", "Vegetable Powder", "Herbal Extracts", "Organic Spices", "B2B Bulk Ingredients", "Food Ingredients Export"],
+    "hasOfferCatalog": { "@type": "OfferCatalog", "name": "24 B2B Powders Catalog", "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Fruit Powders" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Vegetable Powders" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Herbal Extracts" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Organic Spices" } }
+    ]}
+  };
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Treishvaam Agro",
+    "url": "https://treishvaamagro.com",
+    "potentialAction": { "@type": "SearchAction", "target": "https://treishvaamagro.com/products?q={search_term_string}", "query-input": "required name=search_term_string" }
   };
 
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen bg-white`}>
-        <Navbar />
-        <main className="flex-grow w-full">
-          {children}
-        </main>
-        <Footer />
+        <RfqProvider>
+          <Navbar />
+          <main className="flex-grow w-full">{children}</main>
+          <Footer />
+          <Toaster richColors position="top-right" />
+          <ThirdPartyScripts />
+        </RfqProvider>
       </body>
     </html>
   );

@@ -50,6 +50,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -58,7 +61,11 @@ const nextConfig = {
         hostname: "images.unsplash.com",
       },
     ],
-  }
+    formats: ["image/avif", "image/webp"],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
 };
 
 export default nextConfig;

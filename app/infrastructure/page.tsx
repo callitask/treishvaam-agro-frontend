@@ -77,47 +77,27 @@ const itemVariants = {
 
 export default function InfrastructurePage() {
   return (
-    <div className="bg-white min-h-screen pb-24">
+    <div className="bg-white min-h-screen">
       
-      {/* Infrastructure Hero */}
-      <section className="relative w-full min-h-[50vh] flex items-center justify-center overflow-hidden bg-brand-dark">
-        <img 
-          src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=2070&auto=format&fit=crop" 
-          alt="Industrial agricultural processing facility" 
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-brand-dark/90 z-10" />
-        
-        <div className="relative z-20 w-full max-w-7xl mx-auto px-6 xl:px-0 text-center flex flex-col items-center">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-white text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
-          >
-            Engineering Nature.
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-gray-200 text-lg md:text-xl font-normal max-w-2xl mx-auto leading-relaxed"
-          >
-            World-class manufacturing and processing facilities designed to bridge the gap between organic farming and enterprise scale.
-          </motion.p>
+      <section className="w-full bg-white border-b border-brand-border">
+        <div className="max-w-7xl mx-auto px-6 xl:px-0 py-10 lg:py-12">
+          <div className="max-w-3xl">
+            <span className="inline-block border border-brand-line bg-brand-pastelGreen text-brand-dark text-[11px] font-bold tracking-widest uppercase px-3 py-1.5">Bridging Farm to Factory • 50,000 sq ft</span>
+            <h1 className="text-[32px] lg:text-[40px] font-bold tracking-[-0.02em] text-brand-dark mt-4 leading-none">Engineering nature, at enterprise scale.</h1>
+            <p className="text-sm text-gray-600 mt-3 leading-5">World-class processing bridging organic farming and global manufacturing. Cold-press, spray-drying and sterilization with in-house ISO labs.</p>
+          </div>
         </div>
       </section>
 
-      {/* 3-Column Facilities Grid */}
-      <section className="w-full py-24 bg-brand-surface-off">
+      <section className="w-full py-10 lg:py-12 bg-white border-b border-brand-border">
         <div className="max-w-7xl mx-auto px-6 xl:px-0">
-          <div className="text-center mb-16">
-            <h2 className="text-brand-dark text-3xl md:text-4xl font-bold mb-4">Our Facilities</h2>
-            <div className="w-20 h-1 bg-brand-primary mx-auto rounded-full" />
+          <div className="flex items-end justify-between gap-4 mb-6 border-b border-brand-border pb-4">
+            <h2 className="text-[18px] font-bold tracking-[-0.01em] text-brand-dark">Our Facilities</h2>
+            <span className="text-xs text-gray-500">500+ MT/yr • 80–120 mesh • &lt;45°C drying</span>
           </div>
 
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-px bg-brand-border border border-brand-border"
             variants={containerVariants}
             initial="hidden"
             whileInView="show"
@@ -127,19 +107,19 @@ export default function InfrastructurePage() {
               <motion.div 
                 key={facility.id} 
                 variants={itemVariants}
-                className="bg-white rounded-card overflow-hidden shadow-resting border border-gray-100 flex flex-col group"
+                className="bg-white flex flex-col group"
               >
-                <div className="relative w-full aspect-[16/9] overflow-hidden">
+                <div className="relative w-full aspect-[16/10] overflow-hidden border-b border-brand-border">
                   <img 
                     src={facility.image} 
                     alt={facility.title} 
-                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
+                    className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform duration-500"
                   />
                 </div>
-                <div className="p-8 flex flex-col flex-grow">
+                <div className="p-6 flex flex-col flex-grow">
                   {facility.icon}
-                  <h3 className="text-brand-dark text-2xl font-bold mb-3">{facility.title}</h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                  <h3 className="text-brand-dark text-[16px] font-bold mt-3 mb-2">{facility.title}</h3>
+                  <p className="text-gray-600 leading-4 text-xs">
                     {facility.description}
                   </p>
                 </div>
@@ -149,27 +129,26 @@ export default function InfrastructurePage() {
         </div>
       </section>
 
-      {/* Capabilities Stats Block */}
-      <section className="w-full py-20 bg-brand-dark text-white">
+      <section className="w-full py-8 bg-white border-b border-brand-border">
         <div className="max-w-7xl mx-auto px-6 xl:px-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-white/10 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-brand-border border border-brand-border">
             
-            <div className="flex flex-col items-center pt-8 md:pt-0">
-              <Settings size={40} className="text-brand-accent mb-4" />
-              <h4 className="text-4xl font-bold mb-2">50,000+</h4>
-              <p className="text-gray-300 font-medium uppercase tracking-wider text-sm">Sq. Ft. Processing Area</p>
+            <div className="flex flex-col items-center text-center p-6 bg-white">
+              <Settings size={28} className="text-brand-primary mb-3" />
+              <div className="text-[22px] font-bold tracking-tight text-brand-dark">50,000+</div>
+              <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500 mt-1">Sq. Ft. Processing Area</div>
             </div>
             
-            <div className="flex flex-col items-center pt-8 md:pt-0">
-              <ShieldCheck size={40} className="text-brand-accent mb-4" />
-              <h4 className="text-4xl font-bold mb-2">ISO 22000</h4>
-              <p className="text-gray-300 font-medium uppercase tracking-wider text-sm">Certified Facilities</p>
+            <div className="flex flex-col items-center text-center p-6 bg-white">
+              <ShieldCheck size={28} className="text-brand-primary mb-3" />
+              <div className="text-[22px] font-bold tracking-tight text-brand-dark">ISO 22000</div>
+              <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500 mt-1">Certified Facilities</div>
             </div>
             
-            <div className="flex flex-col items-center pt-8 md:pt-0">
-              <Leaf size={40} className="text-brand-accent mb-4" />
-              <h4 className="text-4xl font-bold mb-2">Zero-Waste</h4>
-              <p className="text-gray-300 font-medium uppercase tracking-wider text-sm">Sustainability Standard</p>
+            <div className="flex flex-col items-center text-center p-6 bg-white">
+              <Leaf size={28} className="text-brand-primary mb-3" />
+              <div className="text-[22px] font-bold tracking-tight text-brand-dark">Zero-Waste</div>
+              <div className="text-[11px] tracking-widest uppercase font-bold text-gray-500 mt-1">Sustainability Standard</div>
             </div>
 
           </div>
