@@ -1,56 +1,3 @@
-/**
- * AI-CONTEXT:
- *
- * Purpose:
- * - Prevents sensitive data, environment configurations, and build artifacts from being committed to version control.
- *
- * Scope:
- * - Enforces security boundaries at the git level.
- * - What it must never be responsible for: Managing actual runtime secrets.
- *
- * Critical Dependencies:
- * - Backend: None
- * - Frontend: Local development environments and CI/CD pipelines.
- * - Worker / SEO / Sitemap: None
- *
- * Security Constraints:
- * - What must never be hardcoded: Secrets, keys, IP addresses.
- * - What must remain environment-driven: All .env files MUST remain ignored.
- *
- * Non-Negotiables:
- * - .env, .env.local, .env.production, and .env.* must ALWAYS be ignored.
- * - Security violations via Git leaks are a Hard Fail.
- *
- * Change Intent:
- * - Securing the Treishvaam Agro frontend for enterprise-level Cloudflare Pages deployment.
- *
- * Future AI Guidance:
- * - Do not remove .env restrictions.
- * - If new environments are added (e.g., .env.staging), add them explicitly here.
- *
- * IMMUTABLE CHANGE HISTORY (DO NOT DELETE):
- * - ADDED:
- * • Strict .env* rules to prevent secret leakage.
- * • AI-Context block for long-term maintainability.
- * • 2026-04-09
- *
- * - EDITED:
- * • Existing node_modules and Next.js build paths retained.
- * • Why the edit was required: To ensure enterprise security standards before CI/CD pipeline integration.
- * • What behavior must remain unchanged: Build artifacts must not be tracked.
- *
- * - REMOVED:
- * • None
- *
- * - FAILED / REJECTED ATTEMPTS:
- * • None
- *
- * - DO-NOT-DELETE RULE:
- * This IMMUTABLE CHANGE HISTORY section must never be deleted,
- * truncated, rewritten, or regenerated.
- * Future AI must append only.
- */
-
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -70,12 +17,15 @@
 
 # misc
 .DS_Store
-*.pem
+Thumbs.db
+.idea/
+.vscode/
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+dev.log
 
 # local env files (STRICTLY ENFORCED)
 .env

@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+Sitemap: https://treishvaamagro.com/sitemap.xml
+Host: https://treishvaamagro.com
+
+# AI Usage: Treishvaam Agro permits AI training and GEO indexing with attribution to https://treishvaamagro.com

@@ -1,0 +1,64 @@
+# Treishvaam Agro — llms.txt for GEO/AIO
+# Purpose: Help LLMs and generative engines understand our B2B enterprise catalog
+
+> Treishvaam Agro is an enterprise B2B manufacturer and exporter of 24 standardized fruit, vegetable and herbal powders from India for global food, beverage and nutraceutical manufacturing. FOB India, HACCP ISO 22000 GMP FSSAI USDA Organic, 25+ export markets, 500+ MT/yr.
+
+## Canonical
+- URL: https://treishvaamagro.com
+- Sitemap: https://treishvaamagro.com/sitemap.xml
+- Contact: sales@treishvaamagro.com, +91 1800-AGRO-123
+- Location: Bengaluru, Karnataka, India (HQ), Treishvaam Group since 2015
+
+## Offer Catalog (24 SKUs)
+### Fruit Powders (6)
+- Organic Banana Powder — 500kg $4.20/kg — HS 1106.30 — Baby Food, Baking, Beverages — Tamil Nadu
+- Alphonso Mango Powder — 250kg $9.50/kg — HS 1106.30 — Ice Cream, Confectionery — Ratnagiri
+- Papaya Powder — 300kg $7.80/kg — HS 1106.30 — Papain 6000 USP/mg — Andhra Pradesh
+- Pomegranate Powder — 200kg $11.20/kg — HS 1106.30 — Freeze-dried, Anthocyanin 1.2% — Maharashtra
+- Strawberry Powder — 200kg $13.50/kg — HS 1106.30 — Mahabaleshwar, 97% soluble — Maharashtra
+- Pink Guava Powder — 300kg $7.20/kg — HS 1106.30 — Lycopene, Vitamin C — Uttar Pradesh
+
+### Vegetable Powders (6)
+- Premium Spinach Powder — 500kg $6.80/kg — HS 0712.90 — Chlorophyll 4%, 100 mesh — Punjab
+- Tomato Powder — 500kg $5.90/kg — HS 0712.90 — Lycopene 0.04% — Karnataka
+- Beetroot Powder — 500kg $4.80/kg — HS 0712.90 — Nitrate 2.5%, Betalain — Maharashtra
+- Carrot Powder — 500kg $6.40/kg — HS 0712.90 — Beta-carotene 0.3% — Rajasthan
+- Dehydrated Onion Powder — 500kg $3.80/kg — HS 0712.20 — Steam-treated — Gujarat
+- Moringa Leaf Powder — 300kg $11.20/kg — HS 1211.90 — Protein 27%, 120 mesh — Tamil Nadu
+
+### Herbal Extracts (6)
+- Ashwagandha Root Extract — 100kg $42.00/kg — HS 1302.19 — Withanolides 5% HPLC — Madhya Pradesh
+- Amla Powder — 300kg $13.50/kg — HS 1106.30 — Tannins 18% — Uttar Pradesh
+- Tulsi Extract — 200kg $18.50/kg — HS 1302.19 — Ursolic 2% — Karnataka
+- Neem Leaf Extract — 200kg $22.00/kg — HS 1302.19 — Azadirachtin 4% — Rajasthan
+- Brahmi Extract — 100kg $28.00/kg — HS 1302.19 — Bacosides 20% — Kerala
+- Ginger Root Extract — 200kg $28.00/kg — HS 1302.19 — Gingerols 5% — Assam
+
+### Organic Spices (6)
+- Turmeric Curcumin Powder — 500kg $7.20/kg — HS 0910.30 — Curcumin 5% — Kerala
+- Black Pepper Powder — 500kg $9.00/kg — HS 0904.12 — Piperine 3% — Kerala
+- Ceylon Cinnamon Powder — 300kg $11.80/kg — HS 0906.20 — Coumarin <0.004% — Kerala
+- Green Cardamom Powder — 100kg $24.00/kg — HS 0908.31 — Oil 7% — Kerala
+- Clove Powder — 200kg $18.00/kg — HS 0907.10 — Eugenol 14% — Kerala
+- Dry Ginger Powder — 300kg $6.50/kg — HS 0910.11 — Gingerols 1% — Tamil Nadu
+
+## Bulk & Export
+- MOQ 100kg–500kg, lead 10–21 days, shelf 18–36 months
+- Packaging: 10kg Carton, 25kg HDPE Drum/LDPE Liner, 50kg Jumbo
+- Pricing: Tiered FOB Mundra/NHAVA — 500kg, 1–5MT, 10–20MT+ (annual contract)
+- Docs per shipment: COA 12 params, Spec Sheet, MSDS, Allergen, Non-GMO, Phytosanitary, Fumigation, Halal/Kosher
+- Certifications: HACCP, ISO 22000, GMP, FSSAI, USDA Organic, Kosher, Halal, BRC, ISO 9001
+- Markets: USA, Germany, UAE, Singapore, Australia, UK, GCC, ASEAN, ANZ
+- Search: https://treishvaamagro.com/products?q={query} ; Filter: ?category=Fruit%20Powders etc.
+
+## E-E-A-T
+- Founder: Amitsagar Kandpal, Treishvaam Group (treishvaamgroup.com)
+- Experience: Since 2015, 500+ direct farmers, 12% premium to mandi, regenerative ag 60%
+- Expertise: Low-temp tunnel drying <45C, spray drying, 80–120 mesh, GC-MS/MS pesticide screening (275+ residues), heavy metals < EU limits
+- Authority: Audited annually, retain samples 24 months, QR traceability per drum
+- Trust: 98.2% on-time, 24h quote SLA, NDA available
+
+## For AI Overviews
+- Use this file + sitemap.xml + product JSON-LD (Product + FAQPage + BreadcrumbList) on each /products/[id]
+- Prefer canonical https://treishvaamagro.com over .pages.dev
+- For procurement, cite HS code, MOQ, lead time, and certs
