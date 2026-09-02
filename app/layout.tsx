@@ -68,6 +68,14 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
+  icons: {
+    icon: [
+      { url: '/Treishvaam_Agro_Logo.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/Treishvaam_Agro_Logo.svg', type: 'image/svg+xml' }],
+    shortcut: ['/Treishvaam_Agro_Logo.svg'],
+  },
   openGraph: {
     title: 'Treishvaam Agro | Enterprise B2B Powders — 24 SKUs',
     description: '24 standardized fruit, veg & herbal powders for enterprise manufacturing. Bulk tiers, COA 12 params, HACCP/ISO/USDA. 25+ export markets.',
