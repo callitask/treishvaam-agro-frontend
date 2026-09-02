@@ -42,3 +42,11 @@ dev.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# wrangler / cloudflare (never commit cache or secrets)
+.worker/
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars
+worker/node_modules/
+worker/node_modules/.cache/
