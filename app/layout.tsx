@@ -70,11 +70,12 @@ export const metadata: Metadata = {
   verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
   icons: {
     icon: [
-      { url: '/Treishvaam_Agro_Logo.svg', type: 'image/svg+xml' },
+      { url: '/Treishvaam_Agro_Icon.svg', type: 'image/svg+xml' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icons/Treishvaam_Agro_Icon.svg', type: 'image/svg+xml' },
     ],
-    apple: [{ url: '/Treishvaam_Agro_Logo.svg', type: 'image/svg+xml' }],
-    shortcut: ['/Treishvaam_Agro_Logo.svg'],
+    apple: [{ url: '/Treishvaam_Agro_Icon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/favicon.svg'],
   },
   openGraph: {
     title: 'Treishvaam Agro | Enterprise B2B Powders — 24 SKUs',
@@ -110,8 +111,8 @@ export default function RootLayout({
     "name": "Treishvaam Agro",
     "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam Agriculture"],
     "url": "https://treishvaamagro.com",
-    "logo": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
-    "image": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+    "logo": "https://treishvaamagro.com/Treishvaam_Agro_Icon.svg",
+    "image": "https://treishvaamagro.com/Treishvaam_Agro_Icon.svg",
     "description": "Enterprise B2B supplier of 24 standardized fruit, vegetable and herbal powders for global food, beverage and nutraceutical manufacturing. FOB India, HACCP ISO 22000 USDA Organic.",
     "foundingDate": "2015",
     "founder": {
