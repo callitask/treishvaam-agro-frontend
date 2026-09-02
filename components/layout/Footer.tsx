@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
             <div className="border border-brand-border bg-white px-3 py-2 text-xs leading-4 text-gray-600">
               <span className="font-bold text-brand-dark">HQ</span> Bengaluru, Karnataka 560001<br />
-              <span className="font-semibold">sales@treishvaamagro.com</span> • +91 1800-AGRO-123
+              <span className="font-semibold">sales@treishvaamagro.com</span> • <a href="tel:+918178529633" className="hover:text-brand-dark">+91 8178 529 633</a>
             </div>
           </div>
 

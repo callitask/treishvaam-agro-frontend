@@ -15,7 +15,7 @@ function SharpMock(){
     <div className="bg-white border border-brand-border">
       {/* Mock Nav - sharp white */}
       <div className="hidden md:flex h-[32px] items-center justify-between px-4 border-b border-brand-border text-[11px]">
-        <span className="text-gray-600">sales@treishvaamagro.com • +91 1800-AGRO-123 • Exports: <span className="font-bold text-brand-dark">USA • EU • GCC • ASEAN</span></span>
+        <span className="text-gray-600">sales@treishvaamagro.com • +91 8178 529 633 • Exports: <span className="font-bold text-brand-dark">USA • EU • GCC • ASEAN</span></span>
         <span className="flex gap-2"><span className="border border-brand-line bg-brand-pastelGreen px-2 py-0.5 text-[10px] font-bold">HACCP • ISO 22000</span><span className="border border-[#F3E8B5] bg-brand-pastelGold px-2 py-0.5 text-[10px] font-bold">USDA Organic</span></span>
       </div>
       <div className="h-[56px] flex items-center justify-between px-4 border-b border-brand-border">

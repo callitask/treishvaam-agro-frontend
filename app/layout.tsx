@@ -115,7 +115,7 @@ export default function RootLayout({
     },
     "parentOrganization": { "@type": "Organization", "name": "Treishvaam Group", "url": "https://treishvaamgroup.com" },
     "address": { "@type": "PostalAddress", "addressLocality": "Bengaluru", "addressRegion": "Karnataka", "addressCountry": "IN" },
-    "contactPoint": { "@type": "ContactPoint", "email": "sales@treishvaamagro.com", "telephone": "+91-1800-AGRO-123", "contactType": "sales", "areaServed": ["US","DE","AE","SG","AU","GB","IN"], "availableLanguage": ["en"] },
+    "contactPoint": { "@type": "ContactPoint", "email": "sales@treishvaamagro.com", "telephone": "+91-8178-529-633", "contactType": "sales", "areaServed": ["US","DE","AE","SG","AU","GB","IN"], "availableLanguage": ["en"] },
     "sameAs": ["https://treishvaamgroup.com"],
     "knowsAbout": ["Fruit Powder Manufacturing", "Vegetable Powder", "Herbal Extracts", "Organic Spices", "B2B Bulk Ingredients", "Food Ingredients Export"],
     "hasOfferCatalog": { "@type": "OfferCatalog", "name": "24 B2B Powders Catalog", "itemListElement": [

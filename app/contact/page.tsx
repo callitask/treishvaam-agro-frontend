@@ -26,7 +26,7 @@ export default function ContactPage() {
             </div>
             <div className="pt-4 border-t border-brand-border">
               <h4 className="text-[11px] font-bold tracking-widest uppercase text-brand-dark">Direct Contact</h4>
-              <p className="text-sm text-gray-700 mt-2 leading-4">sales@treishvaamagro.com<br/>+91 1800-AGRO-123<br/><span className="text-gray-500 text-xs">Mon–Fri 9am–6pm IST • Sat 10am–2pm</span></p>
+              <p className="text-sm text-gray-700 mt-2 leading-4"><a href="mailto:sales@treishvaamagro.com" className="hover:text-brand-dark">sales@treishvaamagro.com</a><br/><a href="tel:+918178529633" className="hover:text-brand-dark">+91 8178 529 633</a><br/><span className="text-gray-500 text-xs">Mon–Fri 9am–6pm IST • Sat 10am–2pm</span></p>
             </div>
             <div className="pt-4 border-t border-brand-border">
               <h4 className="text-[11px] font-bold tracking-widest uppercase text-brand-dark">Export Compliance</h4>

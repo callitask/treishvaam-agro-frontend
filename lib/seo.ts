@@ -62,7 +62,7 @@ export function generateOrganizationJsonLd() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "sales",
-      telephone: "+91 1800-AGRO-123",
+      telephone: "+91-8178-529-633",
       email: "sales@treishvaamagro.com",
       areaServed: "Global",
       availableLanguage: ["English"],

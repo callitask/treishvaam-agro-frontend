@@ -33,9 +33,9 @@ export default function Navbar() {
               <Mail size={12} className="text-brand-primary" /> sales@treishvaamagro.com
             </span>
             <span className="w-px h-3 bg-brand-border" />
-            <span className="flex items-center gap-1.5 text-gray-600">
-              <Phone size={12} className="text-brand-primary" /> +91 1800-AGRO-123
-            </span>
+            <a href="tel:+918178529633" className="flex items-center gap-1.5 text-gray-600 hover:text-brand-dark">
+              <Phone size={12} className="text-brand-primary" /> +91 8178 529 633
+            </a>
             <span className="hidden lg:inline w-px h-3 bg-brand-border" />
             <span className="hidden lg:inline text-gray-500">Exports: <span className="font-semibold text-brand-dark">USA • EU • GCC • ASEAN</span></span>
           </div>
