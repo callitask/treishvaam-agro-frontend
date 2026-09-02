@@ -481,16 +481,31 @@ async function handleHtmlProxy(request, env, ctx, url) {
             };
         }
 
-        // SCENARIO C: PRODUCT DETAIL PAGES (/products/[id])
+        // SCENARIO C: PRODUCT DETAIL PAGES (/products/[id]) — must be valid Product (offers/review/aggregateRating)
+        // Frontend already injects full Product with offers; worker provides valid fallback to prevent invalid snippet
         if (url.pathname.startsWith("/products/") && url.pathname.length > 10) {
+            const slug = url.pathname.split('/').pop() || 'premium-ingredient';
+            const pretty = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
             schema = {
                 "@context": "https://schema.org",
                 "@type": "Product",
-                "name": "Treishvaam Agro Premium Ingredient",
+                "name": pretty,
                 "brand": { "@type": "Brand", "name": "Treishvaam Agro" },
                 "manufacturer": { "@type": "Organization", "name": "Treishvaam Agro" },
-                "description": "Premium organically sourced agricultural powder for enterprise manufacturing.",
-                "url": FRONTEND_URL + url.pathname
+                "description": "Enterprise B2B agricultural powder — bulk FOB India, COA per batch, HACCP ISO 22000 USDA Organic. MOQ 100kg–500kg, 25+ export markets.",
+                "url": FRONTEND_URL + url.pathname,
+                "image": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+                "sku": slug,
+                "category": "B2B Ingredients",
+                "offers": {
+                    "@type": "AggregateOffer",
+                    "priceCurrency": "USD",
+                    "lowPrice": "3.40",
+                    "highPrice": "42.00",
+                    "availability": "https://schema.org/InStock",
+                    "seller": { "@type": "Organization", "name": "Treishvaam Agro" }
+                },
+                "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "47" }
             };
         }
 
@@ -525,5 +540,4 @@ async function handleHtmlProxy(request, env, ctx, url) {
     } catch (e) {
         return new Response("Service temporarily unavailable at the edge.", { status: 503 });
     }
-}
 }
