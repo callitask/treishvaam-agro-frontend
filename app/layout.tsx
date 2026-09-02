@@ -127,10 +127,10 @@ export default function RootLayout({
     "sameAs": ["https://treishvaamgroup.com"],
     "knowsAbout": ["Fruit Powder Manufacturing", "Vegetable Powder", "Herbal Extracts", "Organic Spices", "B2B Bulk Ingredients", "Food Ingredients Export"],
     "hasOfferCatalog": { "@type": "OfferCatalog", "name": "24 B2B Powders Catalog", "itemListElement": [
-      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Fruit Powders" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Vegetable Powders" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Herbal Extracts" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Organic Spices" } }
+      { "@type": "Offer", "name": "Fruit Powders — Bulk B2B", "category": "Fruit Powders", "url": "https://treishvaamagro.com/products?category=Fruit%20Powders", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "seller": { "@type": "Organization", "name": "Treishvaam Agro" } },
+      { "@type": "Offer", "name": "Vegetable Powders — Bulk B2B", "category": "Vegetable Powders", "url": "https://treishvaamagro.com/products?category=Vegetable%20Powders", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "seller": { "@type": "Organization", "name": "Treishvaam Agro" } },
+      { "@type": "Offer", "name": "Herbal Extracts — Bulk B2B", "category": "Herbal Extracts", "url": "https://treishvaamagro.com/products?category=Herbal%20Extracts", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "seller": { "@type": "Organization", "name": "Treishvaam Agro" } },
+      { "@type": "Offer", "name": "Organic Spices — Bulk B2B", "category": "Organic Spices", "url": "https://treishvaamagro.com/products?category=Organic%20Spices", "priceCurrency": "USD", "availability": "https://schema.org/InStock", "seller": { "@type": "Organization", "name": "Treishvaam Agro" } }
     ]}
   };
   const websiteJsonLd = {

@@ -167,9 +167,39 @@ async function handleSitemap(request, env, ctx, url) {
 
     const backendUrl = new URL(backendOrigin);
     
+    // Agro static fallback — used when backend meta is empty or unreachable
+    function buildAgroStaticSitemapIndex(frontendUrl) {
+        // Enterprise Agro routes that must be ranked (no finance segments) — includes terms/privacy for completeness
+        const agroSegments = [
+            '/sitemap-dynamic/pages/0.xml',
+            '/sitemap-dynamic/products/0.xml'
+        ];
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        for (const seg of agroSegments) {
+            xml += `  <sitemap>\n    <loc>${frontendUrl}${seg}</loc>\n    <lastmod>${new Date().toISOString()}</lastmod>\n  </sitemap>\n`;
+        }
+        xml += '</sitemapindex>';
+        return xml;
+    }
+
+    // Agro static URL set for fallback when backend unavailable — must match Next.js sitemap.ts
+    function buildAgroStaticUrlSet(frontendUrl) {
+        const routes = ['', '/products', '/quality', '/sustainability', '/infrastructure', '/contact', '/terms', '/privacy'];
+        const products = ['banana-powder','mango-powder','papaya-powder','pomegranate-powder','strawberry-powder','guava-powder','spinach-powder','tomato-powder','beetroot-powder','carrot-powder','onion-powder','moringa-powder','ashwagandha-extract','amla-powder','tulsi-extract','neem-extract','brahmi-extract','ginger-extract','turmeric-powder','black-pepper-powder','cinnamon-powder','cardamom-powder','clove-powder','ginger-powder'];
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+        for (const r of routes) {
+            xml += `  <url><loc>${frontendUrl}${r || '/'}</loc><lastmod>${new Date().toISOString()}</lastmod><changefreq>weekly</changefreq><priority>${r===''?'1.0':'0.8'}</priority></url>\n`;
+        }
+        for (const p of products) {
+            xml += `  <url><loc>${frontendUrl}/products/${p}</loc><lastmod>${new Date().toISOString()}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>\n`;
+        }
+        xml += '</urlset>';
+        return xml;
+    }
+
     try {
         if (url.pathname === '/sitemap.xml') {
-            // Fetch Meta to build index dynamically
+            // Fetch Meta to build index dynamically — tenant-isolated
             const metaUrl = new URL('/api/public/sitemap/meta', backendUrl);
             const backendReq = new Request(metaUrl.toString(), request);
             backendReq.headers.set('X-Tenant-ID', 'agro'); 
@@ -182,14 +212,25 @@ async function handleSitemap(request, env, ctx, url) {
             let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
             const FRONTEND_URL = `https://${url.hostname}`;
             
+            // Zero-trust: Only include Agro-relevant sitemaps, exclude finance-only segments (blog/market)
+            const FINANCE_ONLY_KEYS = ['blog', 'market', 'finance', 'news', 'insights'];
+            let hasAgroSegments = false;
             for (const key in metaJson) {
+                if (FINANCE_ONLY_KEYS.includes(key.toLowerCase())) continue;
                 if (Array.isArray(metaJson[key])) {
-                    metaJson[key].forEach(segment => {
+                    const filtered = metaJson[key].filter(seg => !seg.includes('/blog/') && !seg.includes('/market/') && !seg.includes('/finance/'));
+                    if (filtered.length) hasAgroSegments = true;
+                    filtered.forEach(segment => {
                         xml += `  <sitemap>\n    <loc>${FRONTEND_URL}${segment}</loc>\n  </sitemap>\n`;
                     });
                 }
             }
-            xml += '</sitemapindex>';
+            // Fallback to static index if backend returned no Agro segments (or only finance)
+            if (!hasAgroSegments) {
+                xml = buildAgroStaticSitemapIndex(FRONTEND_URL);
+            } else {
+                xml += '</sitemapindex>';
+            }
 
             ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, xml, { expirationTtl: 86400 }));
             
@@ -197,13 +238,20 @@ async function handleSitemap(request, env, ctx, url) {
                 headers: {
                     'Content-Type': 'application/xml',
                     'Cache-Control': 'public, s-maxage=86400, max-age=3600',
-                    'X-Cache-Status': 'MISS-KV-FETCHED'
+                    'X-Cache-Status': hasAgroSegments ? 'MISS-KV-FETCHED' : 'MISS-KV-FALLBACK-STATIC'
                 }
             });
             ctx.waitUntil(cache.put(cacheRequest, freshResponse.clone()));
             return freshResponse;
 
         } else if (url.pathname.startsWith('/sitemap-dynamic/')) {
+            // Block finance-only segments on Agro tenant (prevent GSC errors)
+            if (url.pathname.includes('/blog/') || url.pathname.includes('/market/') || url.pathname.includes('/finance/')) {
+                return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>', {
+                    status: 404,
+                    headers: { 'Content-Type': 'application/xml', 'Cache-Control': 'public, max-age=3600' }
+                });
+            }
             // Rewrite segment fetch to backend API path
             const backendPath = url.pathname.replace('/sitemap-dynamic/', '/api/public/sitemap/');
             const segmentUrl = new URL(backendPath, backendUrl);
@@ -229,11 +277,15 @@ async function handleSitemap(request, env, ctx, url) {
                 return freshResponse;
                 
             } else {
-                 return new Response("Backend error generating sitemap data.", { status: response.status });
+                 // Fallback to static Agro URL set if backend fails — ensures GSC always gets Agro pages
+                 const fallback = buildAgroStaticUrlSet(`https://${url.hostname}`);
+                 return new Response(fallback, { status: 200, headers: { 'Content-Type': 'application/xml', 'Cache-Control': 'public, max-age=3600', 'X-Fallback': 'static-agro-urlset' } });
             }
         }
     } catch (error) {
-        return new Response("Backend unreachable. Sitemap generation pending.", { status: 503 });
+        // Never return 503 for sitemap — serve fallback static index so GSC can fetch
+        const fallbackIndex = buildAgroStaticSitemapIndex(`https://${url.hostname}`);
+        return new Response(fallbackIndex, { status: 200, headers: { 'Content-Type': 'application/xml', 'Cache-Control': 'public, max-age=3600', 'X-Fallback': 'static-agro' } });
     }
 }
 
@@ -277,7 +329,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
     // KNOWN SPA ROUTES FOR AGGRESSIVE 200 OK FALLBACK (Fixes GSC Indexing Errors)
     const KNOWN_SPA_ROUTES = [
         "/about", "/infrastructure", "/quality", "/sustainability", 
-        "/products", "/contact", "/home"
+        "/products", "/contact", "/home", "/terms", "/privacy"
     ];
 
     try {
@@ -325,10 +377,10 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "name": "Treishvaam Agro",
                 "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam", "Treishvam", "Trishvam"],
                 "url": FRONTEND_URL,
-                "logo": "https://treishvaamgroup.com/logo512.webp",
-                "image": "https://treishvaamgroup.com/logo512.webp",
+                "logo": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+                "image": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
                 "description": pageDesc,
-                "telephone": "+91 1800-AGRO-123",
+                "telephone": "+91 8178 529 633",
                 "email": "sales@treishvaamagro.com",
                 "address": {
                     "@type": "PostalAddress",
@@ -341,7 +393,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "contactPoint": {
                     "@type": "ContactPoint",
                     "contactType": "sales",
-                    "telephone": "+91 1800-AGRO-123",
+                    "telephone": "+91 8178 529 633",
                     "email": "sales@treishvaamagro.com",
                     "areaServed": "Global",
                     "availableLanguage": "English"
@@ -363,7 +415,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                     "name": "Treishvaam Group",
                     "alternateName": ["Treishvam Group", "Treshvam Group", "Trishvam Group"],
                     "url": PARENT_ORG_URL,
-                    "logo": "https://treishvaamgroup.com/logo512.webp",
+                    "logo": "https://treishvaamgroup.com/Treishvaam_Agro_Logo.svg",
                     "sameAs": [
                         "https://www.linkedin.com/company/treishvaamgroup",
                         "https://twitter.com/treishvaamgroup",
@@ -424,7 +476,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                     "@type": "Organization",
                     "name": "Treishvaam Agro",
                     "parentOrganization": { "@type": "Corporation", "name": "Treishvaam Group" },
-                    "logo": { "@type": "ImageObject", "url": "https://treishvaamgroup.com/logo512.webp" }
+                    "logo": { "@type": "ImageObject", "url": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg" }
                 }
             };
         }
