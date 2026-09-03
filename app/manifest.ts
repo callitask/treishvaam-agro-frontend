@@ -10,9 +10,10 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: '#ffffff',
     theme_color: '#1F4524',
     icons: [
-      { src: '/Treishvaam_Agro_Icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-      { src: '/icons/Treishvaam_Agro_Icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: '/Treishvaam_Agro_Icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
+      { src: '/apple-touch-icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
       { src: '/Treishvaam_Agro_Logo.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
     ],
   };

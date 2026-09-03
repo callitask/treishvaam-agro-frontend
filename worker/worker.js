@@ -377,8 +377,8 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 "name": "Treishvaam Agro",
                 "alternateName": ["Treishvam Agro", "Treshvam Agro", "Trishvam Agro", "Treishvaam", "Treishvam", "Trishvam"],
                 "url": FRONTEND_URL,
-                "logo": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
-                "image": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg",
+                "logo": "https://treishvaamagro.com/favicon.svg",
+                "image": "https://treishvaamagro.com/favicon.svg",
                 "description": pageDesc,
                 "telephone": "+91 8178 529 633",
                 "email": "sales@treishvaamagro.com",
@@ -476,7 +476,7 @@ async function handleHtmlProxy(request, env, ctx, url) {
                     "@type": "Organization",
                     "name": "Treishvaam Agro",
                     "parentOrganization": { "@type": "Corporation", "name": "Treishvaam Group" },
-                    "logo": { "@type": "ImageObject", "url": "https://treishvaamagro.com/Treishvaam_Agro_Logo.svg" }
+                    "logo": { "@type": "ImageObject", "url": "https://treishvaamagro.com/favicon.svg" }
                 }
             };
         }
