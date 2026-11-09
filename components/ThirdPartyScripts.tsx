@@ -9,7 +9,8 @@
 
 import { useEffect, useState } from 'react';
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-J1X48J18M4';
+const STRICT_PRIVACY = process.env.NEXT_PUBLIC_ENFORCE_STRICT_PRIVACY === 'true';
 const ADSENSE_ID = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 const GADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
@@ -40,7 +41,7 @@ export default function ThirdPartyScripts() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${GA_ID}', { anonymize_ip: true });
+          gtag('config', '${GA_ID}', { anonymize_ip: ${String(STRICT_PRIVACY)} });
         `;
         document.head.appendChild(s2);
       }

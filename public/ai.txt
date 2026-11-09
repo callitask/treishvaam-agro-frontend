@@ -19,4 +19,4 @@ Allow: /
 Sitemap: https://treishvaamagro.com/sitemap.xml
 Host: https://treishvaamagro.com
 
-# AI Usage: Treishvaam Agro permits AI training and GEO indexing with attribution to https://treishvaamagro.com
+# AI Usage Policy: Public GEO feeds (/llms.txt, /ai-feed.md, /ontology.json) and public pages are permitted for AI Search, RAG Grounding, Answer Engine Indexing, and Citation with attribution to Treishvaam Group. Unauthorized scraping of private/admin endpoints or using proprietary source code for model weight training is strictly prohibited.
