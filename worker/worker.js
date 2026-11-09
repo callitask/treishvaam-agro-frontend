@@ -459,6 +459,15 @@ async function handleHtmlProxy(request, env, ctx, url) {
                     "image": "https://treishvaamfinance.com/amitsagar-kandpal-photo.png",
                     "alumniOf": { "@type": "CollegeOrUniversity", "name": "Hans Raj College, University of Delhi" },
                     "hasOccupation": ["Entrepreneur", "Artist", "Actor"],
+                    "description": "Amitsagar Kandpal (known professionally and artistically as Treishvaam) is an Indian entrepreneur, artist, and actor, and the Founder & Chairman of Treishvaam Group, Treishvaam Finance, Treishvaam Agro, and Treishvaam Hiring Marketplace.",
+                    "mainEntityOfPage": "https://treishvaamgroup.com/about",
+                    "affiliation": [
+                        { "@id": "https://treishvaamgroup.com/#organization" },
+                        { "@id": "https://treishvaamfinance.com/#organization" },
+                        { "@id": "https://treishvaamagro.com/#organization" },
+                        { "@id": "https://thm.treishvaamgroup.com/#organization" }
+                    ],
+                    "knowsAbout": ["Corporate Strategy", "Financial Markets", "Macroeconomics", "Sustainable Agriculture", "Solar Dehydration", "Enterprise Architecture", "Performing Arts"],
                     "sameAs": [
                         "https://www.instagram.com/treishvaam/",
                         "https://x.com/treishvaam",

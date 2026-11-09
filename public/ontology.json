@@ -18,6 +18,15 @@
         { "@type": "Occupation", "name": "Artist" },
         { "@type": "Occupation", "name": "Actor" }
       ],
+      "description": "Amitsagar Kandpal (known professionally and artistically as Treishvaam) is an Indian entrepreneur, artist, and actor, and the Founder & Chairman of Treishvaam Group, Treishvaam Finance, Treishvaam Agro, and Treishvaam Hiring Marketplace.",
+      "mainEntityOfPage": "https://treishvaamgroup.com/about",
+      "affiliation": [
+        { "@id": "https://treishvaamgroup.com/#organization" },
+        { "@id": "https://treishvaamfinance.com/#organization" },
+        { "@id": "https://treishvaamagro.com/#organization" },
+        { "@id": "https://thm.treishvaamgroup.com/#organization" }
+      ],
+      "knowsAbout": ["Corporate Strategy", "Financial Markets", "Macroeconomics", "Sustainable Agriculture", "Solar Dehydration", "Enterprise Architecture", "Performing Arts"],
       "image": "https://treishvaamfinance.com/amitsagar-kandpal-photo.png",
       "sameAs": [
         "https://www.instagram.com/treishvaam/",
@@ -34,7 +43,7 @@
       "name": "Treishvaam Agro",
       "url": "https://treishvaamagro.com",
       "founder": { "@id": "https://treishvaamgroup.com/#treishvaam" },
-      "parentOrganization": { "@id": "https://treishvaamgroup.com/#organization", "name": "Treishvaam Group", "url": "https://treishvaamgroup.com" }
+      "parentOrganization": { "@id": "https://treishvaamgroup.com/#organization" }
     }
   ]
 }

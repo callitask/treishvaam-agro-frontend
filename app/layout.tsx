@@ -150,6 +150,9 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="Treishvaam Agro LLM Knowledge Graph" />
+        <link rel="alternate" type="text/markdown" href="/ai-feed.md" title="Treishvaam Agro AI Semantic Feed" />
+        <link rel="alternate" type="application/ld+json" href="/ontology.json" title="Treishvaam Agro Entity Ontology" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </head>

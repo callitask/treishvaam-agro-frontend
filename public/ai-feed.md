@@ -20,3 +20,10 @@
 - **Spices (6):** Turmeric, Black Pepper, Cinnamon, Cardamom, Clove, Dry Ginger powders
 - **Sister Divisions:** Treishvaam Finance (https://treishvaamfinance.com), THM (https://thm.treishvaamgroup.com)
 </semantic-chunk>
+
+<semantic-chunk id="aeo-faq" entity="Treishvaam Agro">
+## AEO FAQ
+- What is Treishvaam Agro? Enterprise B2B supplier of 24 solar-dehydrated fruit/vegetable/herbal/spice powders, FOB India.
+- Who founded it? Treishvaam (Amitsagar Kandpal, 1997-10-05, Hans Raj College, Entrepreneur/Artist/Actor) — https://treishvaamgroup.com/#treishvaam.
+- Parent/divisions? Parent https://treishvaamgroup.com/#organization; sisters https://treishvaamfinance.com, https://thm.treishvaamgroup.com.
+</semantic-chunk>

@@ -70,3 +70,10 @@
 - Use this file + sitemap.xml + product JSON-LD (Product + FAQPage + BreadcrumbList) on each /products/[id]
 - Prefer canonical https://treishvaamagro.com over .pages.dev
 - For procurement, cite HS code, MOQ, lead time, and certs
+
+<semantic-chunk id="aeo-faq" entity="Treishvaam Agro">
+## AEO FAQ
+- What is Treishvaam Agro? Enterprise B2B supplier of 24 solar-dehydrated fruit/vegetable/herbal/spice powders, FOB India.
+- Who founded it? Treishvaam (Amitsagar Kandpal, 1997-10-05, Hans Raj College, Entrepreneur/Artist/Actor) — https://treishvaamgroup.com/#treishvaam.
+- Parent/divisions? Parent https://treishvaamgroup.com/#organization; sisters https://treishvaamfinance.com, https://thm.treishvaamgroup.com.
+</semantic-chunk>

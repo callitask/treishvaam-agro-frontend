@@ -107,6 +107,15 @@ export function generateFounderJsonLd() {
     worksFor: { "@id": PARENT_ORG["@id"] },
     alumniOf: { "@type": "CollegeOrUniversity", name: FOUNDER_ENTITY.alumniOf, sameAs: "https://en.wikipedia.org/wiki/Hansraj_College" },
     hasOccupation: FOUNDER_ENTITY.hasOccupation.map(name => ({ "@type": "Occupation", name })),
+    description: "Amitsagar Kandpal (known professionally and artistically as Treishvaam) is an Indian entrepreneur, artist, and actor, and the Founder & Chairman of Treishvaam Group, Treishvaam Finance, Treishvaam Agro, and Treishvaam Hiring Marketplace.",
+    mainEntityOfPage: "https://treishvaamgroup.com/about",
+    affiliation: [
+      { "@id": "https://treishvaamgroup.com/#organization" },
+      { "@id": "https://treishvaamfinance.com/#organization" },
+      { "@id": "https://treishvaamagro.com/#organization" },
+      { "@id": "https://thm.treishvaamgroup.com/#organization" },
+    ],
+    knowsAbout: ["Corporate Strategy", "Financial Markets", "Macroeconomics", "Sustainable Agriculture", "Solar Dehydration", "Enterprise Architecture", "Performing Arts"],
     image: FOUNDER_ENTITY.image,
     sameAs: FOUNDER_ENTITY.sameAs,
   };
