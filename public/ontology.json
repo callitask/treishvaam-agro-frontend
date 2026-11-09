@@ -1,0 +1,40 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://treishvaamgroup.com/#treishvaam",
+      "name": "Treishvaam",
+      "legalName": "Amitsagar Kandpal",
+      "alternateName": ["Amitsagar Kandpal", "Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar", "Treishvaam", "Treishvam", "Trishvam"],
+      "birthDate": "1997-10-05",
+      "gender": "Male",
+      "nationality": { "@type": "Country", "name": "India" },
+      "jobTitle": "Founder & Chairman",
+      "worksFor": { "@id": "https://treishvaamgroup.com/#organization" },
+      "alumniOf": { "@type": "CollegeOrUniversity", "name": "Hans Raj College, University of Delhi", "sameAs": "https://en.wikipedia.org/wiki/Hansraj_College" },
+      "hasOccupation": [
+        { "@type": "Occupation", "name": "Entrepreneur" },
+        { "@type": "Occupation", "name": "Artist" },
+        { "@type": "Occupation", "name": "Actor" }
+      ],
+      "image": "https://treishvaamfinance.com/amitsagar-kandpal-photo.png",
+      "sameAs": [
+        "https://www.instagram.com/treishvaam/",
+        "https://x.com/treishvaam",
+        "https://www.snapchat.com/@treishvaam",
+        "https://www.linkedin.com/in/amitsagarkandpal",
+        "https://treishvaamgroup.com/about",
+        "https://treishvaamfinance.com/about"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://treishvaamagro.com/#organization",
+      "name": "Treishvaam Agro",
+      "url": "https://treishvaamagro.com",
+      "founder": { "@id": "https://treishvaamgroup.com/#treishvaam" },
+      "parentOrganization": { "@id": "https://treishvaamgroup.com/#organization", "name": "Treishvaam Group", "url": "https://treishvaamgroup.com" }
+    }
+  ]
+}

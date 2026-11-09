@@ -67,12 +67,62 @@
  * This IMMUTABLE CHANGE HISTORY section must never be deleted,
  * truncated, rewritten, or regenerated.
  * Future AI must append only.
+ *
+ * - EDITED (Phase 13.2 - L1 caches.default + 6h KV Throttle + GEO Edge + Canonical Founder Schemas):
+ * • Added caches.default-first for /llms.txt, /ai.txt, /ai-feed.md, /ontology.json served cleanly at Edge; KV reads only on edge miss with try/catch.
+ * • Added KV_WRITE_COOLDOWN_MS (6h) + lastKvWriteAt throttle + __kvUpdatedAt envelope for sitemap KV puts.
+ * • Synchronized organizationSchema/founderSchema with canonical Knowledge Panel (@id, name, legalName, birthDate, alumniOf, hasOccupation, image, sameAs, parentOrganization).
  */
+
+// Phase 13.2 — 6-hour KV write throttle (shared TREISHFIN_SEO_CACHE quota protection)
+const KV_WRITE_COOLDOWN_MS_AGRO = 6 * 60 * 60 * 1000;
+const lastKvWriteAtAgro = new Map();
+async function kvPutThrottledAgro(env, ctx, key, value) {
+    try {
+        const last = lastKvWriteAtAgro.get(key) || 0;
+        if (Date.now() - last < KV_WRITE_COOLDOWN_MS_AGRO) return false;
+        const existing = await env.TREISHFIN_SEO_CACHE.get(key);
+        if (existing) {
+            try { const p = JSON.parse(existing); const at = p?.__kvUpdatedAt || 0; if (Date.now() - at < KV_WRITE_COOLDOWN_MS_AGRO) return false; } catch (e) { return false; }
+        }
+        await env.TREISHFIN_SEO_CACHE.put(key, JSON.stringify({ __kvUpdatedAt: Date.now(), payload: value }), { expirationTtl: 86400 });
+        lastKvWriteAtAgro.set(key, Date.now());
+        return true;
+    } catch (e) { return false; }
+}
+async function kvGetUnwrapAgro(env, key) {
+    try {
+        const raw = await env.TREISHFIN_SEO_CACHE.get(key);
+        if (!raw) return null;
+        try { const p = JSON.parse(raw); if (p && '__kvUpdatedAt' in p && 'payload' in p) return p.payload; } catch (e) {}
+        return raw;
+    } catch (e) { return null; }
+}
 
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
         const path = url.pathname;
+
+        // Phase 13.2 GEO Edge: serve llms/ai/ai-feed/ontology via caches.default (unlimited) then KV, else Pages origin
+        if (path === '/llms.txt' || path === '/ai.txt' || path === '/ai-feed.md' || path === '/ontology.json') {
+            const cache = caches.default;
+            const cacheReq = new Request(request.url, { method: 'GET' });
+            try {
+                const edgeHit = await cache.match(cacheReq);
+                if (edgeHit) return new Response(edgeHit.body, edgeHit);
+            } catch (e) {}
+            try {
+                const kvHit = await kvGetUnwrapAgro(env, `geo:agro:${path}`);
+                if (kvHit) {
+                    const ct = path.endsWith('.md') ? 'text/markdown; charset=utf-8' : path.endsWith('.json') ? 'application/json; charset=utf-8' : 'text/plain; charset=utf-8';
+                    const resp = new Response(kvHit, { headers: { 'Content-Type': ct, 'Cache-Control': 'public, s-maxage=86400, max-age=3600', 'X-Cache': 'HIT-KV' } });
+                    try { ctx.waitUntil(cache.put(cacheReq, resp.clone())); } catch (e) {}
+                    return resp;
+                }
+            } catch (e) {}
+            // Fall through to Pages origin HTML/proxy handling below for cold GEO files (static export in out/)
+        }
 
         // SEO Routing: Sitemaps Interception
         if (path === '/sitemap.xml' || path.startsWith('/sitemap-dynamic/')) {
@@ -140,9 +190,9 @@ async function handleSitemap(request, env, ctx, url) {
 
     const cacheKey = `sitemap:agro:${url.pathname}`;
 
-    // Tier 2: Check KV Store (Cost: 1 KV Read)
+    // Tier 2: Check KV Store (Cost: 1 KV Read, unwrapped envelope)
     try {
-        const cached = await env.TREISHFIN_SEO_CACHE.get(cacheKey);
+        const cached = await kvGetUnwrapAgro(env, cacheKey);
         if (cached) {
             const isJson = cacheKey === 'sitemap:agro:meta';
             const kvResponse = new Response(cached, {
@@ -232,7 +282,7 @@ async function handleSitemap(request, env, ctx, url) {
                 xml += '</sitemapindex>';
             }
 
-            ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, xml, { expirationTtl: 86400 }));
+            ctx.waitUntil(kvPutThrottledAgro(env, ctx, cacheKey, xml));
             
             const freshResponse = new Response(xml, {
                 headers: {
@@ -263,7 +313,7 @@ async function handleSitemap(request, env, ctx, url) {
 
             if (response.ok) {
                 const body = await response.text();
-                ctx.waitUntil(env.TREISHFIN_SEO_CACHE.put(cacheKey, body, { expirationTtl: 86400 }));
+                ctx.waitUntil(kvPutThrottledAgro(env, ctx, cacheKey, body));
                 
                 const freshResponse = new Response(body, {
                     headers: {
@@ -400,27 +450,28 @@ async function handleHtmlProxy(request, env, ctx, url) {
                 },
                 "founder": {
                     "@type": "Person",
-                    "name": "Amitsagar Kandpal",
-                    "alternateName": ["Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar", "Treishvaam", "Treishvam", "Trishvam"],
+                    "@id": "https://treishvaamgroup.com/#treishvaam",
+                    "name": "Treishvaam",
+                    "legalName": "Amitsagar Kandpal",
+                    "alternateName": ["Amitsagar Kandpal", "Amit Kandpal", "Amit Sagar Kandpal", "Amitsagar", "Treishvaam", "Treishvam", "Trishvam"],
+                    "birthDate": "1997-10-05",
                     "jobTitle": "Founder & Chairman",
-                    "url": "https://treishvaamgroup.com/",
+                    "image": "https://treishvaamfinance.com/amitsagar-kandpal-photo.png",
+                    "alumniOf": { "@type": "CollegeOrUniversity", "name": "Hans Raj College, University of Delhi" },
+                    "hasOccupation": ["Entrepreneur", "Artist", "Actor"],
                     "sameAs": [
+                        "https://www.instagram.com/treishvaam/",
+                        "https://x.com/treishvaam",
+                        "https://www.snapchat.com/@treishvaam",
                         "https://www.linkedin.com/in/amitsagarkandpal",
-                        "https://twitter.com/treishvaam",
-                        "https://www.instagram.com/treishvaam"
+                        "https://treishvaamgroup.com/about",
+                        "https://treishvaamfinance.com/about"
                     ]
                 },
                 "parentOrganization": {
-                    "@type": "Corporation",
+                    "@id": "https://treishvaamgroup.com/#organization",
                     "name": "Treishvaam Group",
-                    "alternateName": ["Treishvam Group", "Treshvam Group", "Trishvam Group"],
-                    "url": PARENT_ORG_URL,
-                    "logo": "https://treishvaamgroup.com/Treishvaam_Agro_Logo.svg",
-                    "sameAs": [
-                        "https://www.linkedin.com/company/treishvaamgroup",
-                        "https://twitter.com/treishvaamgroup",
-                        "https://www.instagram.com/treishvaamgroup"
-                    ]
+                    "url": "https://treishvaamgroup.com"
                 }
             };
             

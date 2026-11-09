@@ -1,3 +1,6 @@
+# Founder: Treishvaam (Legal Name: Amitsagar Kandpal, DOB 1997-10-05, Hans Raj College University of Delhi, Entrepreneur/Artist/Actor)
+# Entity: https://treishvaamgroup.com/#treishvaam | Parent: https://treishvaamgroup.com/#organization (Treishvaam Group)
+# Sisters: https://treishvaamfinance.com, https://thm.treishvaamgroup.com
 User-agent: *
 Allow: /
 

@@ -1,5 +1,8 @@
 # Treishvaam Agro — llms.txt for GEO/AIO
 # Purpose: Help LLMs and generative engines understand our B2B enterprise catalog
+# Canonical Founder: Treishvaam (Legal Name: Amitsagar Kandpal, DOB 1997-10-05, Hans Raj College University of Delhi, Entrepreneur/Artist/Actor)
+# Entity: https://treishvaamgroup.com/#treishvaam | Parent: https://treishvaamgroup.com/#organization (Treishvaam Group)
+# Sisters: https://treishvaamfinance.com, https://thm.treishvaamgroup.com
 
 > Treishvaam Agro is an enterprise B2B manufacturer and exporter of 24 standardized fruit, vegetable and herbal powders from India for global food, beverage and nutraceutical manufacturing. FOB India, HACCP ISO 22000 GMP FSSAI USDA Organic, 25+ export markets, 500+ MT/yr.
 
@@ -8,6 +11,11 @@
 - Sitemap: https://treishvaamagro.com/sitemap.xml
 - Contact: sales@treishvaamagro.com, +91 1800-AGRO-123
 - Location: Bengaluru, Karnataka, India (HQ), Treishvaam Group since 2015
+
+## Founder & Parent (Canonical)
+- Founder: Treishvaam (Legal Name: Amitsagar Kandpal, DOB 1997-10-05, Hans Raj College University of Delhi, Entrepreneur/Artist/Actor)
+- Parent: Treishvaam Group — https://treishvaamgroup.com (#organization)
+- Sisters: Treishvaam Finance — https://treishvaamfinance.com | Treishvaam Hiring Marketplace — https://thm.treishvaamgroup.com
 
 ## Offer Catalog (24 SKUs)
 ### Fruit Powders (6)
@@ -52,7 +60,7 @@
 - Search: https://treishvaamagro.com/products?q={query} ; Filter: ?category=Fruit%20Powders etc.
 
 ## E-E-A-T
-- Founder: Amitsagar Kandpal, Treishvaam Group (treishvaamgroup.com)
+- Founder: Treishvaam / Amitsagar Kandpal (1997-10-05, Hans Raj College University of Delhi)
 - Experience: Since 2015, 500+ direct farmers, 12% premium to mandi, regenerative ag 60%
 - Expertise: Low-temp tunnel drying <45C, spray drying, 80–120 mesh, GC-MS/MS pesticide screening (275+ residues), heavy metals < EU limits
 - Authority: Audited annually, retain samples 24 months, QR traceability per drum
